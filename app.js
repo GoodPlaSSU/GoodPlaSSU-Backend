@@ -11,7 +11,10 @@ var app = express();
 
 // db connection
 const db = require('./db/index');
-db.connect();
+db.connect(err => {
+  if (err) console.log('err');
+  else console.log('데이터베이스 연결 성공');
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
