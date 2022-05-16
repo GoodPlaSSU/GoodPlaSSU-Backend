@@ -10,7 +10,7 @@ var usersRouter = require('./routes/users');
 var app = express();
 
 // db connection
-var db = require('./db/index');
+const db = require('./db/index');
 db.connect();
 
 // view engine setup
