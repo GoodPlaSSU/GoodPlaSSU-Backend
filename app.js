@@ -9,6 +9,7 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+// db connection
 const db = require('./db/index');
 db.connect();
 
