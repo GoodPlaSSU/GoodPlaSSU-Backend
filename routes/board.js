@@ -3,7 +3,7 @@ const router = express.Router();
 
 const db = require('../db/index');
 
-router.get('/board', (req,res) => {
+router.get('/board', function(req,res) {
     var responseData = {};
 
     const sql = 'select * from board order by created_at desc;';
