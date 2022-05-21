@@ -29,8 +29,8 @@ router.get('/board/:id', (req, res) => {
     var responseData = {};
 
     const id = req.params.id;
-    const sql1 = 'update board set view_count = view_count + 1 where id = ' + id + ';'; // 조회수 증가 쿼리
-    const sql2 = 'select user_key, content, image1, image2, image3, image4, updated_at from board where id = ' + id + ';';
+    const sql1 = 'update board set view_count = view_count + 1 where id = ${id};'; // 조회수 증가 쿼리
+    const sql2 = 'select user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at from board where id = ${id};';
 
     var query = pg.query(sql1 + sql2, (err, rows) => {
         if (err) throw err;
@@ -65,7 +65,7 @@ router.post('/board', (req, res) => {
 router.post('/board/:id', (req, res) => {
     const id = req.params.id;
     const data = req.body;
-    const sql = 'update board set content = $1, image1 = $2, image2 = $3, image3 = $4, image4 = $5 where id = ' + id + ';';
+    const sql = 'update board set content = $1, image1 = $2, image2 = $3, image3 = $4, image4 = $5 where id = ${id};';
     const dbInput = [data.content, data.image1, data.image2, data.image3, data.image4];
 
     var query = pg.query(sql, dbInput, (err) => {
@@ -79,7 +79,7 @@ router.post('/board/:id', (req, res) => {
 // 게시물 삭제 API
 router.delete('/board/:id', (req, res) => {
     const id = req.params.id;
-    const sql = 'delete from board where id = ' + id + ';';
+    const sql = 'delete from board where id = ${id};';
 
     var query = pg.query(sql, (err) => {
         if (err) throw err;
