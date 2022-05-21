@@ -3,11 +3,13 @@ const router = express.Router();
 
 const db = require('../db/index');
 
-router.get('/', function(req, res) {
+// 요청 받은 ID의 게시물 정보 보내기
+router.get('/', (req, res) => {
     var id = req.query.id;
     var responseData = {};
 
-    var query = pg.query('select * from board where id=' + id, (err, rows) => {
+    const sql = 'select * from board where id=' + id;
+    var query = pg.query(sql, (err, rows) => {
         if (err) throw err;
         if (rows) {
             responseData.result = 1;
@@ -15,8 +17,10 @@ router.get('/', function(req, res) {
         } else {
             responseData.result = 0;
         }
-        res.json(responseData);
     })
+
+    res.json(responseData);
+    res.sendStatus(200);
 });
 
 module.exports = router;
