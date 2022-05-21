@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const db = require('../db/index');
+const pg = require('../db/index');
 
 // 요청 받은 ID의 게시물 정보 보내기
 router.get('/', (req, res) => {
