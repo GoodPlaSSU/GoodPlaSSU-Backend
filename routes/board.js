@@ -50,7 +50,7 @@ router.get('/:id', (req, res) => {
                 from board 
                 where id = ${id};`;
 
-    var query = pg.query(sql1 + sql2, (err, rows) => {
+    pg.query(sql1 + sql2, (err, rows) => {
         if (err) throw err;
         if (rows) {
             responseData.result = 1;
@@ -74,7 +74,7 @@ router.post('/', (req, res) => {
                 values ($1, $2, $3, $4, $5, $6, $7);`;
     const dbInput = [data.user_key, data.content, data.image1, data.image2, data.image3, data.image4, data.tag];
 
-    var query = pg.query(sql, dbInput, (err) => {
+    pg.query(sql, dbInput, (err) => {
         if (err) throw err;
     });
 
@@ -93,7 +93,7 @@ router.post('/:id', (req, res) => {
                 where id = ${id};`;
     const dbInput = [data.content, data.image1, data.image2, data.image3, data.image4];
 
-    var query = pg.query(sql, dbInput, (err) => {
+    pg.query(sql, dbInput, (err) => {
         if (err) throw err;
     });
     
@@ -108,7 +108,7 @@ router.delete('/:id', (req, res) => {
 
     const sql = `delete from board where id = ${id};`;
 
-    var query = pg.query(sql, (err) => {
+    pg.query(sql, (err) => {
         if (err) throw err;
     });
 
