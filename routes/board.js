@@ -25,15 +25,13 @@ router.get('/', function(req,res) {
     pg.query(sql, (err, rows) => {
         if (err) throw err;
         if (rows) {
-            responseData.result = 1;
+            responseData.result = rows.rowCount;
             responseData.post = rows.rows;
         } else {
             responseData.result = 0;
         }
+        res.status(200).json(responseData);
     });   
-
-    res.json(responseData);
-    res.sendStatus(200);
 });
 
 
@@ -50,54 +48,49 @@ router.get('/:id', (req, res) => {
                 from board 
                 where id = ${id};`;
 
-    pg.query(sql1 + sql2, (err, rows) => {
+    pg.query(sql1+sql2, (err, rows) => {
         if (err) throw err;
         if (rows) {
             responseData.result = 1;
-            responseData.post = rows.rows;
+            responseData.post = rows[1].rows;
         } else {
             responseData.result = 0;
         }
+        res.status(200).json(responseData);
     });
-
-    res.json(responseData);
-    res.sendStatus(200);
 });
 
 
 // 게시물 생성 API
 // request: user_key, content, image1, image2, image3, image4, tag (json)
 router.post('/', (req, res) => {
-    const data = req.body;
-
     const sql = `insert into board (user_key, content, image1, image2, image3, image4, tag) 
                 values ($1, $2, $3, $4, $5, $6, $7);`;
-    const dbInput = [data.user_key, data.content, data.image1, data.image2, data.image3, data.image4, data.tag];
+    const dbInput = [req.body.user_key, req.body.content, req.body.image1, req.body.image2, req.body.image3, req.body.image4, req.body.tag];
 
     pg.query(sql, dbInput, (err) => {
         if (err) throw err;
+        res.sendStatus(201);
     });
-
-    res.sendStatus(201);
 });
 
 
 // 게시물 수정 API
 // request: content, image1, image2, image3, image4 (json)
+// 수정 안된 값도 그대로 json 파일에 포함시켜 꼭 보내주기!
+// 안보내주면 자동으로 null 값으로 들어감.
 router.post('/:id', (req, res) => {
     const id = req.params.id;
-    const data = req.body;
 
     const sql = `update board 
                 set content = $1, image1 = $2, image2 = $3, image3 = $4, image4 = $5, updated_at = NOW() 
                 where id = ${id};`;
-    const dbInput = [data.content, data.image1, data.image2, data.image3, data.image4];
+    const dbInput = [req.body.content, req.body.image1, req.body.image2, req.body.image3, req.body.image4];
 
     pg.query(sql, dbInput, (err) => {
         if (err) throw err;
+        res.sendStatus(201);
     });
-    
-    res.sendStatus(201);
 });
 
 
@@ -110,9 +103,8 @@ router.delete('/:id', (req, res) => {
 
     pg.query(sql, (err) => {
         if (err) throw err;
+        res.sendStatus(204);
     });
-
-    res.sendStatus(204);
 });
 
 
