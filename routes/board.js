@@ -1,28 +1,41 @@
 const express = require('express');
 const router = express.Router();
-
 const pg = require('../db/index');
 
+
 // 게시판의 한 페이지에 해당하는 게시물 조회 API
+// request: tag, cursor (query string)
 router.get('/', function(req,res) {
     var responseData = {};
     const tag = req.query.tag;
+    const cursor = req.query.cursor; // 직전에 받았던 게시물의 cursor
 
-    const sql = `select * from board order by created_at desc;`;
+    // cursor 기반 페이지네이션
+    // 클라이언트가 가져간 마지막 row의 순서상 다음 row들을 10개 요청/응답하게 구현
+    // 기준: cursor
+    // cursor: created_at + id
+    // cursor가 클수록 최근 게시물
+    // 직전에 받았던 게시물의 cursor보다 작은 cursor를 가지는 게시물들은 좀 더 오래된 게시물들
+    const sql = `select id, user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, concat(to_char(created_at, 'YYYYMMDDHH24MISS'), lpad(id, 10, '0')) as cursor
+                from board
+                where tag = ${tag} and concat(to_char(created_at, 'YYYYMMDDHH24MISS'), lpad(id, 10, '0')) < ${cursor}
+                order by created_at desc, id desc
+                limit 10`;
 
     pg.query(sql, (err, rows) => {
-        if (err) console.log(err.stack);
+        if (err) throw err;
         if (rows) {
             responseData.result = 1;
-            responseData.data = rows.rows;
+            responseData.post = rows.rows;
         } else {
             responseData.result = 0;
         }
-    });
+    });   
 
     res.json(responseData);
     res.sendStatus(200);
 });
+
 
 // 요청 받은 ID의 게시물 조회 API (게시물 상세 조회 API)
 // request: id (parameter values)
