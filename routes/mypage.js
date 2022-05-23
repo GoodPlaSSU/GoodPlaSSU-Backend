@@ -58,9 +58,6 @@ router.get('/mycomment', (req, res) => {
     const id = req.query.id;
     const cursor = req.query.cursor;
 
-    console.log(id);
-    console.log(cursor);
-
     const sql = `select distinct b.id, p.name, p.portrait, b.content, b.image1, b.image2, b.image3, b.image4, b.view_count, b.cheer_count, b.updated_at, (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) as cursor
                 from comment as c
                 inner join board as b
