@@ -30,12 +30,12 @@ router.get('/', (req, res) => {
 router.get('/mypost', (req, res) => {
     var responseData = {};
     const id = req.query.id;
-    const cursor = req.query.cursosr;
+    const cursor = req.query.cursor;
 
     const sql = `select board.id, name, portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
                 from profile, board
                 where profile.id = ${id} and board.user_key = ${id} and (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) < ${cursor}
-                order by created_at desc, board.id desc
+                order by cursor desc
                 limit 10;`;
     
     pg.query(sql, (err, rows) => {
@@ -56,16 +56,19 @@ router.get('/mypost', (req, res) => {
 router.get('/mycomment', (req, res) => {
     var responseData = {};
     const id = req.query.id;
-    const cursor = req.query.cursosr;
+    const cursor = req.query.cursor;
 
-    const sql = `select board.id, name, portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
-                from comment
-                inner join board
-                on board.id = comment.board_key
-                inner join profile
-                on profile.id = board.user_key
-                where comment.user_key = ${id} and (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) < ${cursor}
-                order by board.created_at desc, board.id desc
+    console.log(id);
+    console.log(cursor);
+
+    const sql = `select distinct b.id, p.name, p.portrait, b.content, b.image1, b.image2, b.image3, b.image4, b.view_count, b.cheer_count, b.updated_at, (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) as cursor
+                from comment as c
+                inner join board as b
+                on b.id = c.board_key
+                inner join profile as p
+                on p.id = b.user_key
+                where c.user_key = ${id} and (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) < ${cursor}
+                order by cursor desc
                 limit 10;`;
     
     pg.query(sql, (err, rows) => {
@@ -86,7 +89,7 @@ router.get('/mycomment', (req, res) => {
 router.get('/mycheer', (req, res) => {
     var responseData = {};
     const id = req.query.id;
-    const cursor = req.query.cursosr;
+    const cursor = req.query.cursor;
 
     const sql = `select board.id, name, portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
                 from cheer
@@ -95,7 +98,7 @@ router.get('/mycheer', (req, res) => {
                 inner join profile
                 on profile.id = board.user_key
                 where cheer.user_key = ${id} and (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) < ${cursor}
-                order by board.created_at desc, board.id desc
+                order by cursor desc
                 limit 10;`;
     
     pg.query(sql, (err, rows) => {
