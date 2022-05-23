@@ -19,8 +19,8 @@ router.get('/', function(req,res) {
     // 직전에 받았던 게시물의 cursor보다 작은 cursor를 가지는 게시물들은 좀 더 오래된 게시물들
     const sql = `select id, user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
                 from board
-                where tag = ${tag} and  (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < ${cursor}
-                order by created_at desc, id desc
+                where tag = ${tag} and (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < ${cursor}
+                order by cursor desc
                 limit 10;`;
 
     pg.query(sql, (err, rows) => {
