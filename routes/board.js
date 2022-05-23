@@ -17,9 +17,9 @@ router.get('/', function(req,res) {
     // 가장 최근 게시물 10개를 받고 싶다면 cursor를 '999999999999999999999999'를 보내주면 됨.(9가 24개)
     // cursor가 클수록 최근 게시물
     // 직전에 받았던 게시물의 cursor보다 작은 cursor를 가지는 게시물들은 좀 더 오래된 게시물들
-    const sql = `select id, user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
+    const sql = `select id, user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, cursor
                 from board
-                where tag = ${tag} and  (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < ${cursor}
+                where tag = ${tag} and  cursor < ${cursor}
                 order by created_at desc, id desc
                 limit 10;`;
 
@@ -64,9 +64,10 @@ router.get('/:id', (req, res) => {
 
 // 게시물 생성 API
 // request: user_key, content, image1, image2, image3, image4, tag (json)
+// cursor: created_at(14자) + id(10자) --> 24자 string
 router.post('/', (req, res) => {
-    const sql = `insert into board (user_key, content, image1, image2, image3, image4, tag) 
-                values ($1, $2, $3, $4, $5, $6, $7);`;
+    const sql = `insert into board (user_key, content, image1, image2, image3, image4, tag, cursor) 
+                values ($1, $2, $3, $4, $5, $6, $7, (to_char(NOW(), 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')));`;
     const dbInput = [req.body.user_key, req.body.content, req.body.image1, req.body.image2, req.body.image3, req.body.image4, req.body.tag];
 
     pg.query(sql, dbInput, (err) => {
