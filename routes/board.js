@@ -65,13 +65,21 @@ router.get('/:id', (req, res) => {
 // 게시물 생성 API
 // request: user_key, content, image1, image2, image3, image4, tag (json)
 router.post('/', (req, res) => {
-    const sql = `insert into board (user_key, content, image1, image2, image3, image4, tag) 
-                values ($1, $2, $3, $4, $5, $6, $7);`;
-    const dbInput = [req.body.user_key, req.body.content, req.body.image1, req.body.image2, req.body.image3, req.body.image4, req.body.tag];
+    const sql1 = `select name, portrait 
+                from profile 
+                where id = ${req.body.user_key};`
 
-    pg.query(sql, dbInput, (err) => {
+    pg.query(sql1, (err, rows) => {
         if (err) throw err;
-        res.sendStatus(201);
+
+        const sql2 = `insert into board (user_key, content, image1, image2, image3, image4, tag, writer_name, writer_portrait) 
+                    values ($1, $2, $3, $4, $5, $6, $7, $8, $9);`;
+        const dbInput = [req.body.user_key, req.body.content, req.body.image1, req.body.image2, req.body.image3, req.body.image4, req.body.tag, rows.rows[0], rows.rows[1]];
+
+        pg.query(sql2, dbInput, (err) => {
+            if (err) throw err;
+            res.sendStatus(201);
+        });
     });
 });
 
