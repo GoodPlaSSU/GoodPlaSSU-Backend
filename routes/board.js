@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pg = require('../db/index');
+const cloudinary = require('cloudinary').v2;
 
 
 // 게시판의 한 페이지에 해당하는 게시물 조회 API
@@ -71,10 +72,24 @@ router.get('/:id', (req, res) => {
 });
 
 
+// Cloudinary 서버에 있는 이미지의 secure_url(https)을 받아오는 함수
+// callback 함수에서 리턴값을 받아올 수 없어서 이렇게 처리해서 리턴값을 받아야 함
+getImageUrl = (image) => {
+    return new Promise((resolve, reject) => {
+        // cloudinary에 이미지를 업로드
+        cloudinary.uploader.upload(image, (err, res) => {
+            if (err) reject(err);
+            // 업로드한 이미지의 secure_url을 리턴하게 함
+            resolve(res.secure_url);
+        })
+    })
+}
+
+
 // 게시물 생성 API
 // request: user_key, content, image1, image2, image3, image4, tag (json)
 // request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장
-router.post('/', (req, res) => {
+router.post('/', async(req, res) => {
     const sql1 = `select name, portrait 
                 from profile 
                 where id = ${req.body.user_key};`; // 작성자 이름, 프로필 사진 가져오는 쿼리
@@ -82,12 +97,25 @@ router.post('/', (req, res) => {
                 set total_point = total_point + 1, month_point = month_point + 1
                 where id = ${req.body.user_key};`; // 작성자 선행 포인트 증가 쿼리
 
+    // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
+    // 만약 image1이 null이 아니면(이미지 파일이 들어왔으면),
+    // cloudinary에 이미지를 업로드하고 업로드 된 그 이미지의 secure_url을 받아옴.
+    var imageUrls = {};
+    if (req.body.image1)
+        imageUrls.image1 = await getImageUrl(req.body.image1);
+    if (req.body.image2)
+        imageUrls.image2 = await getImageUrl(req.body.image2);
+    if (req.body.image3)
+        imageUrls.image3 = await getImageUrl(req.body.image3);
+    if (req.body.image4)
+        imageUrls.image4 = await getImageUrl(req.body.image4);
+
     pg.query(sql1+sql2, (err, rows) => {
         if (err) throw err;
 
         const sql3 = `insert into board (user_key, content, image1, image2, image3, image4, tag, writer_name, writer_portrait) 
                     values ($1, $2, $3, $4, $5, $6, $7, $8, $9);`;
-        const dbInput = [req.body.user_key, req.body.content, req.body.image1, req.body.image2, req.body.image3, req.body.image4, req.body.tag, rows[0].rows[0].name, rows[0].rows[0].portrait];
+        const dbInput = [req.body.user_key, req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4, req.body.tag, rows[0].rows[0].name, rows[0].rows[0].portrait];
 
         pg.query(sql3, dbInput, (err) => {
             if (err) throw err;
