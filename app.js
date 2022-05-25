@@ -6,7 +6,6 @@ var logger = require('morgan');
 var cloudinary = require('cloudinary').v2;
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var boardRouter = require('./routes/board');
 var commentRouter = require('./routes/comment');
 var mypageRouter = require('./routes/mypage');
@@ -40,7 +39,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/board', boardRouter);
 app.use('/comment', commentRouter);
 app.use('/mypage', mypageRouter);

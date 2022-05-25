@@ -6,7 +6,7 @@ const cloudinary = require('cloudinary').v2;
 
 // 게시판의 한 페이지에 해당하는 게시물 조회 API
 // request: tag, cursor (query string)
-router.get('/', function(req,res) {
+router.get('/', (req,res) => {
     var responseData = {};
     const tag = req.query.tag;
     const cursor = req.query.cursor; // 직전에 받았던 게시물의 cursor
