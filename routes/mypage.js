@@ -86,11 +86,11 @@ router.get('/mycheer', (req, res) => {
     const id = req.query.id;
     const cursor = req.query.cursor;
 
-    const sql = `select b.id, b.writer_name, b.writer_portrait, b.content, b.image1, b.image2, b.image3, b.image4, b.view_count, b.cheer_count, b.updated_at, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
+    const sql = `select b.id, b.writer_name, b.writer_portrait, b.content, b.image1, b.image2, b.image3, b.image4, b.view_count, b.cheer_count, b.updated_at, (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) as cursor
                 from cheer as c
                 inner join board as b
                 on b.id = c.board_key
-                where c.user_key = ${id} and (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) < ${cursor}
+                where c.user_key = ${id} and (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) < ${cursor}
                 order by cursor desc
                 limit 10;`;
     
