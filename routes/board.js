@@ -17,7 +17,7 @@ router.get('/', function(req,res) {
     // 가장 최근 게시물 10개를 받고 싶다면 cursor를 '999999999999999999999999'를 보내주면 됨.(9가 24개)
     // cursor가 클수록 최근 게시물
     // 직전에 받았던 게시물의 cursor보다 작은 cursor를 가지는 게시물들은 좀 더 오래된 게시물들
-    const sql = `select id, user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
+    const sql = `select id, user_key, writer_name, writer_portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
                 from board
                 where tag = ${tag} and (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < ${cursor}
                 order by cursor desc
@@ -45,7 +45,7 @@ router.get('/:id', (req, res) => {
     const sql1 = `update board 
                 set view_count = view_count + 1 
                 where id = ${id};`; // 조회수 증가 쿼리
-    const sql2 = `select user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at 
+    const sql2 = `select user_key, writer_name, writer_portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at 
                 from board 
                 where id = ${id};`;
 
@@ -64,14 +64,23 @@ router.get('/:id', (req, res) => {
 
 // 게시물 생성 API
 // request: user_key, content, image1, image2, image3, image4, tag (json)
+// request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장
 router.post('/', (req, res) => {
-    const sql = `insert into board (user_key, content, image1, image2, image3, image4, tag) 
-                values ($1, $2, $3, $4, $5, $6, $7);`;
-    const dbInput = [req.body.user_key, req.body.content, req.body.image1, req.body.image2, req.body.image3, req.body.image4, req.body.tag];
+    const sql1 = `select name, portrait 
+                from profile 
+                where id = ${req.body.user_key};`
 
-    pg.query(sql, dbInput, (err) => {
+    pg.query(sql1, (err, rows) => {
         if (err) throw err;
-        res.sendStatus(201);
+
+        const sql2 = `insert into board (user_key, content, image1, image2, image3, image4, tag, writer_name, writer_portrait) 
+                    values ($1, $2, $3, $4, $5, $6, $7, $8, $9);`;
+        const dbInput = [req.body.user_key, req.body.content, req.body.image1, req.body.image2, req.body.image3, req.body.image4, req.body.tag, rows.rows[0].name, rows.rows[0].portrait];
+
+        pg.query(sql2, dbInput, (err) => {
+            if (err) throw err;
+            res.sendStatus(201);
+        });
     });
 });
 
