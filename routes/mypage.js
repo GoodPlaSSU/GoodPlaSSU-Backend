@@ -4,7 +4,7 @@ const pg = require('../db/index');
 
 // 사용자 정보 조회 API
 // request: id (parameter values) --> 없는 사용자일 경우 404 에러뜨기
-router.get('/:id', (req, res) => {
+router.get('/user/:id', (req, res) => {
     var responseData = {};
     const id = req.params.id;
 
@@ -32,7 +32,7 @@ router.get('/mypost', (req, res) => {
     const id = req.query.id;
     const cursor = req.query.cursor;
 
-    const sql = `select id, name, portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, writer_name, writer_portrait, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
+    const sql = `select id, writer_name, writer_portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
                 from board
                 where board.user_key = ${id} and (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) < ${cursor}
                 order by cursor desc
@@ -58,7 +58,7 @@ router.get('/mycomment', (req, res) => {
     const id = req.query.id;
     const cursor = req.query.cursor;
 
-    const sql = `select distinct b.id, b.content, b.image1, b.image2, b.image3, b.image4, b.view_count, b.cheer_count, b.updated_at, b.writer_name, b.writer_portrait, (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) as cursor
+    const sql = `select distinct b.id, b.writer_name, b.writer_portrait, b.content, b.image1, b.image2, b.image3, b.image4, b.view_count, b.cheer_count, b.updated_at, (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) as cursor
                 from comment as c
                 inner join board as b
                 on b.id = c.board_key
@@ -86,7 +86,7 @@ router.get('/mycheer', (req, res) => {
     const id = req.query.id;
     const cursor = req.query.cursor;
 
-    const sql = `select b.id, b.content, b.image1, b.image2, b.image3, b.image4, b.view_count, b.cheer_count, b.updated_at, b.writer_name, b.writer_portrait, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
+    const sql = `select b.id, b.writer_name, b.writer_portrait, b.content, b.image1, b.image2, b.image3, b.image4, b.view_count, b.cheer_count, b.updated_at, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
                 from cheer as c
                 inner join board as b
                 on b.id = c.board_key
