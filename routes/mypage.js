@@ -90,7 +90,7 @@ router.get('/mycheer', (req, res) => {
                 from cheer as c
                 inner join board as b
                 on b.id = c.board_key
-                where c.user_key = ${id} and (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) < ${cursor}
+                where c.user_key = ${id} and c.is_on = true and (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) < ${cursor}
                 order by cursor desc
                 limit 10;`;
     
