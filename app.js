@@ -10,6 +10,7 @@ var boardRouter = require('./routes/board');
 var commentRouter = require('./routes/comment');
 var mypageRouter = require('./routes/mypage');
 var adRouter = require('./routes/ad');
+var cheerRouter = require('./routes/cheer');
 
 var app = express();
 
@@ -36,6 +37,7 @@ app.use('/board', boardRouter);
 app.use('/comment', commentRouter);
 app.use('/mypage', mypageRouter);
 app.use('/ad', adRouter);
+app.use('/cheer', cheerRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
