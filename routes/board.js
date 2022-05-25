@@ -17,7 +17,7 @@ router.get('/', function(req,res) {
     // 가장 최근 게시물 10개를 받고 싶다면 cursor를 '999999999999999999999999'를 보내주면 됨.(9가 24개)
     // cursor가 클수록 최근 게시물
     // 직전에 받았던 게시물의 cursor보다 작은 cursor를 가지는 게시물들은 좀 더 오래된 게시물들
-    const sql = `select id, user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
+    const sql = `select id, user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, writer_name, writer_portrait, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
                 from board
                 where tag = ${tag} and (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < ${cursor}
                 order by cursor desc
@@ -45,7 +45,7 @@ router.get('/:id', (req, res) => {
     const sql1 = `update board 
                 set view_count = view_count + 1 
                 where id = ${id};`; // 조회수 증가 쿼리
-    const sql2 = `select user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at 
+    const sql2 = `select user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, writer_name, writer_portrait 
                 from board 
                 where id = ${id};`;
 

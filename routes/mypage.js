@@ -3,10 +3,10 @@ const router = express.Router();
 const pg = require('../db/index');
 
 // 사용자 정보 조회 API
-// request: id (query string) --> 없는 사용자일 경우 404 에러보다는 로그인/회원가입 창 뜨는 게 나을 것 같아서? 논의 필요
-router.get('/', (req, res) => {
+// request: id (parameter values) --> 없는 사용자일 경우 404 에러뜨기
+router.get('/:id', (req, res) => {
     var responseData = {};
-    const id = req.query.id;
+    const id = req.params.id;
 
     const sql = `select name, portrait, total_point, month_point
                 from profile
@@ -32,9 +32,9 @@ router.get('/mypost', (req, res) => {
     const id = req.query.id;
     const cursor = req.query.cursor;
 
-    const sql = `select board.id, name, portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
-                from profile, board
-                where profile.id = ${id} and board.user_key = ${id} and (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) < ${cursor}
+    const sql = `select id, name, portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, writer_name, writer_portrait, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
+                from board
+                where board.user_key = ${id} and (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) < ${cursor}
                 order by cursor desc
                 limit 10;`;
     
@@ -58,12 +58,10 @@ router.get('/mycomment', (req, res) => {
     const id = req.query.id;
     const cursor = req.query.cursor;
 
-    const sql = `select distinct b.id, p.name, p.portrait, b.content, b.image1, b.image2, b.image3, b.image4, b.view_count, b.cheer_count, b.updated_at, (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) as cursor
+    const sql = `select distinct b.id, b.content, b.image1, b.image2, b.image3, b.image4, b.view_count, b.cheer_count, b.updated_at, b.writer_name, b.writer_portrait, (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) as cursor
                 from comment as c
                 inner join board as b
                 on b.id = c.board_key
-                inner join profile as p
-                on p.id = b.user_key
                 where c.user_key = ${id} and (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) < ${cursor}
                 order by cursor desc
                 limit 10;`;
@@ -88,13 +86,11 @@ router.get('/mycheer', (req, res) => {
     const id = req.query.id;
     const cursor = req.query.cursor;
 
-    const sql = `select board.id, name, portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
-                from cheer
-                inner join board
-                on board.id = cheer.board_key
-                inner join profile
-                on profile.id = board.user_key
-                where cheer.user_key = ${id} and (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) < ${cursor}
+    const sql = `select b.id, b.content, b.image1, b.image2, b.image3, b.image4, b.view_count, b.cheer_count, b.updated_at, b.writer_name, b.writer_portrait, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
+                from cheer as c
+                inner join board as b
+                on b.id = c.board_key
+                where c.user_key = ${id} and (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) < ${cursor}
                 order by cursor desc
                 limit 10;`;
     
