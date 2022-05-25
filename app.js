@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var cloudinary = require('cloudinary').v2;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -19,6 +20,13 @@ const db = require('./db/index');
 db.connect(err => {
 	if (err) console.log('데이터베이스 연결 실패');
 	else console.log('데이터베이스 연결 성공');
+});
+
+// cloudinary connection
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
 });
 
 // view engine setup
