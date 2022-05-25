@@ -54,6 +54,15 @@ router.get('/:id', (req, res) => {
         if (rows) {
             responseData.result = 1;
             responseData.post = rows[1].rows;
+
+            const sql3 = `update profile
+                        set total_point = total_point + 1, month_point = month_point + 1
+                        where id = ${rows[1].rows[0].user_key};`; // 작성자 선행 포인트 증가 쿼리
+            
+            pg.query(sql3, (err) => {
+                if (err) throw err;
+            });
+
         } else {
             responseData.result = 0;
         }
@@ -68,16 +77,19 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
     const sql1 = `select name, portrait 
                 from profile 
-                where id = ${req.body.user_key};`
+                where id = ${req.body.user_key};`; // 작성자 이름, 프로필 사진 가져오는 쿼리
+    const sql2 = `update profile
+                set total_point = total_point + 1, month_point = month_point + 1
+                where id = ${req.body.user_key};`; // 작성자 선행 포인트 증가 쿼리
 
-    pg.query(sql1, (err, rows) => {
+    pg.query(sql1+sql2, (err, rows) => {
         if (err) throw err;
 
-        const sql2 = `insert into board (user_key, content, image1, image2, image3, image4, tag, writer_name, writer_portrait) 
+        const sql3 = `insert into board (user_key, content, image1, image2, image3, image4, tag, writer_name, writer_portrait) 
                     values ($1, $2, $3, $4, $5, $6, $7, $8, $9);`;
-        const dbInput = [req.body.user_key, req.body.content, req.body.image1, req.body.image2, req.body.image3, req.body.image4, req.body.tag, rows.rows[0].name, rows.rows[0].portrait];
+        const dbInput = [req.body.user_key, req.body.content, req.body.image1, req.body.image2, req.body.image3, req.body.image4, req.body.tag, rows[0].rows[0].name, rows[0].rows[0].portrait];
 
-        pg.query(sql2, dbInput, (err) => {
+        pg.query(sql3, dbInput, (err) => {
             if (err) throw err;
             res.sendStatus(201);
         });
