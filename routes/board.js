@@ -125,17 +125,61 @@ router.post('/', async(req, res) => {
 });
 
 
+// 수정 및 삭제할 때 필요. Cloudinary 서버에 있는 이미지를 지우기 위함.
+// board 테이블에 있는 url 가져와서 리턴함
+getDelImageUrl = (sql, index) => {
+    return new Promise((resolve, reject) => {
+        pg.query(sql, (err, res) => {
+            if (err) reject(err);
+            if (index == 1)
+                resolve(res.rows[0].image1);
+            else if (index == 2)
+                resolve(res.rows[0].image2);
+            else if (index == 3)
+                resolve(res.rows[0].image3);
+            else
+                resolve(res.rows[0].image4);
+        })
+    })
+}
+
+
 // 게시물 수정 API
 // request: content, image1, image2, image3, image4 (json)
 // 수정 안된 값도 그대로 json 파일에 포함시켜 꼭 보내주기!
 // 안보내주면 자동으로 null 값으로 들어감.
-router.post('/:id', (req, res) => {
+router.post('/:id', async(req, res) => {
     const id = req.params.id;
 
     const sql = `update board 
                 set content = $1, image1 = $2, image2 = $3, image3 = $4, image4 = $5, updated_at = NOW() 
                 where id = ${id};`;
-    const dbInput = [req.body.content, req.body.image1, req.body.image2, req.body.image3, req.body.image4];
+
+    // 기존에 cloudinary 서버에 올라가있는 이미지도 지우기 위한 부분.
+    var i;
+    for (i = 1; i <= 4; i++) {
+        const delImgSql = `select image${i} from board where id = ${id};`;
+        var delImgUrl = await getDelImageUrl(delImgSql, i);
+        if (delImgUrl) {
+            const public_id = delImgUrl.split("/").pop().split(".")[0];
+            cloudinary.uploader.destroy(public_id, (err) => {
+                if (err) throw err;
+            })
+        }
+    }
+
+    // 수정된 이미지만 cloudinary에 업로드하고 그 url 받아서 디비에 넣어줌.
+    var imageUrls = {};
+    if (req.body.image1)
+        imageUrls.image1 = await getImageUrl(req.body.image1);
+    if (req.body.image2)
+        imageUrls.image2 = await getImageUrl(req.body.image2);
+    if (req.body.image3)
+        imageUrls.image3 = await getImageUrl(req.body.image3);
+    if (req.body.image4)
+        imageUrls.image4 = await getImageUrl(req.body.image4);
+
+    const dbInput = [req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4];
 
     pg.query(sql, dbInput, (err) => {
         if (err) throw err;
@@ -146,10 +190,23 @@ router.post('/:id', (req, res) => {
 
 // 게시물 삭제 API
 // request: id (parameter values)
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async(req, res) => {
     const id = req.params.id;
 
     const sql = `delete from board where id = ${id};`;
+
+    // 기존에 cloudinary 서버에 올라가있는 이미지도 지우기 위한 부분.
+    var i;
+    for (i = 1; i <= 4; i++) {
+        const delImgSql = `select image${i} from board where id = ${id};`;
+        var delImgUrl = await getDelImageUrl(delImgSql, i);
+        if (delImgUrl) {
+            const public_id = delImgUrl.split("/").pop().split(".")[0];
+            cloudinary.uploader.destroy(public_id, (err) => {
+                if (err) throw err;
+            })
+        }
+    }
 
     pg.query(sql, (err) => {
         if (err) throw err;
