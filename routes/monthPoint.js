@@ -26,8 +26,9 @@ router.get('/', async (req, res) => {
             const rows2 = await pg.query(sql2);
 
             if (rows2) {
-                responseData.result = rows2.rowCount;
-                responseData.monthUsers = rows2.rows;
+                responseData.result = rows2.rowCount; // 이달의 선행왕 유저 수
+                responseData.maxPoint = maxPoint; // 이달의 선행왕의 선행 포인트
+                responseData.monthUsers = rows2.rows; // 이달의 선행왕 유저들 name
             } else {
                 responseData.result = 0;
             }
