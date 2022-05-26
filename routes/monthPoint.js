@@ -3,40 +3,39 @@ const router = express.Router();
 const pg = require('../db/index');
 
 // 이달의 선행왕 선정 API
-router.get('/', (req, res) => {
+// require: 없음.
+// 유저가 없어서 maxPoint select 쿼리 결과가 없거나
+// maxPoint가 선행 포인트 최솟값(10)보다 작은 경우 result = 0만 response
+// 그 외에는 maxpoint 값을 가지고 있는 유저들의 name을 response
+router.get('/', async (req, res) => {
     var responseData = {};
 
-    const sql1 = `select max(month_point) from profile;`;
+    const sql1 = `select max(month_point) from profile;`; // 선행 포인트 최댓값 select 쿼리
 
-    pg.query(sql1, (err, rows) => {
-        if (err) throw err;
-        if (rows) {
-            const maxPoint = rows.rows[0].month_point;
+    try {
+        const rows1 = await pg.query(sql1);
+        const maxPoint = rows1.rows[0].max; // month_point 최댓값
 
-            if (rows.rowCount == 0 || maxPoint == 0) {
-                responseData.result = 0;
-                res.status(200).json(responseData);
-            } else {
-                const sql2 = `select name
-                            from profile
-                            where month_point = ${maxPoint};`;
-                
-                pg.query(sql2, (err, rows) => {
-                    if (err) throw err;
-                    if (rows) {
-                        responseData.result = 1;
-                        responseData.monthUsers = rows.rows;
-                    } else {
-                        responseData.result = 0;
-                    }
-                    res.status(200).json(responseData);
-                });
-            }
-        } else {
+        if (rows1.rowCount == 0 || maxPoint < 10) {
             responseData.result = 0;
-            res.status(200).json(responseData);
+        } else {
+            const sql2 = `select name
+                        from profile
+                        where month_point = ${maxPoint};`; // 이달의 선행왕 name select 쿼리
+
+            const rows2 = await pg.query(sql2);
+
+            if (rows2) {
+                responseData.result = 1;
+                responseData.monthUsers = rows2.rows;
+            } else {
+                responseData.result = 0;
+            }
         }
-    });
+        res.status(200).json(responseData);
+    } catch (err) {
+        throw err;
+    }
 });
 
 
