@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
         const rows1 = await pg.query(sql1);
         const maxPoint = rows1.rows[0].max; // month_point 최댓값
 
-        if (rows1.rowCount == 0 || maxPoint < 10) {
+        if (rows1.rowCount == 0 || maxPoint < 10) { // 결과가 없거나 최솟값(10)보다 작은 경우
             responseData.result = 0;
         } else {
             const sql2 = `select name
