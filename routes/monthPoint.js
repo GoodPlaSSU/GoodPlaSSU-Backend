@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
             const rows2 = await pg.query(sql2);
 
             if (rows2) {
-                responseData.result = 1;
+                responseData.result = rows2.rowCount;
                 responseData.monthUsers = rows2.rows;
             } else {
                 responseData.result = 0;
