@@ -11,6 +11,7 @@ var commentRouter = require('./routes/comment');
 var mypageRouter = require('./routes/mypage');
 var adRouter = require('./routes/ad');
 var cheerRouter = require('./routes/cheer');
+var monthPointRouter = require('./routes/monthPoint');
 
 var app = express();
 
@@ -44,6 +45,7 @@ app.use('/comment', commentRouter);
 app.use('/mypage', mypageRouter);
 app.use('/ad', adRouter);
 app.use('/cheer', cheerRouter);
+app.use('/monthPoint', monthPointRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
