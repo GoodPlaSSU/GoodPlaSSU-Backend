@@ -92,3 +92,6 @@ const insertUserIntoDB = (payload) => {
 
     return token;
 }
+
+
+module.exports = router;
