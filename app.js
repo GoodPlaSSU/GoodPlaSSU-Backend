@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cloudinary = require('cloudinary').v2;
+const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var boardRouter = require('./routes/board');
@@ -48,6 +49,12 @@ app.use('/ad', adRouter);
 app.use('/cheer', cheerRouter);
 app.use('/monthPoint', monthPointRouter);
 app.use('/login', loginRouter);
+
+// CORS setting
+app.use(cors({
+  origin: '*', // 출처 허용 옵션
+  credential: 'true' // 사용자 인증이 필요한 리소스(쿠키 ..등) 접근
+}));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
