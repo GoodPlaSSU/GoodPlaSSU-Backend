@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cloudinary = require('cloudinary').v2;
+var cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var boardRouter = require('./routes/board');
@@ -50,13 +51,17 @@ app.use('/monthPoint', monthPointRouter);
 app.use('/login', loginRouter);
 
 // CORS setting
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", [ "http://localhost:3000", "https://goodplassu.herokuapp.com/" ]);
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  res.header("Access-Control-Allow-Methods", "POST, GET, DELETE");
-  res.header("Access-Control-Allow-Credentials", "true");
-  next();
-});
+var whitelist = [ "http://localhost:3000", "https://goodplassu.herokuapp.com/" ]
+
+var corsOptions = {
+  origin: function(origin, callback) {
+    var isWhitelisted = whitelist.indexOf(origin) !== -1;
+    callback(null, isWhitelisted);
+  },
+  credentials: true
+}
+
+app.use(cors(corsOptions));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
