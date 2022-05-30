@@ -13,6 +13,7 @@ var mypageRouter = require('./routes/mypage');
 var adRouter = require('./routes/ad');
 var cheerRouter = require('./routes/cheer');
 var monthPointRouter = require('./routes/monthPoint');
+var loginRouter = require('./routes/login');
 
 var app = express();
 
@@ -47,6 +48,7 @@ app.use('/mypage', mypageRouter);
 app.use('/ad', adRouter);
 app.use('/cheer', cheerRouter);
 app.use('/monthPoint', monthPointRouter);
+app.use('/login', loginRouter);
 
 // CORS setting
 app.use(cors({
