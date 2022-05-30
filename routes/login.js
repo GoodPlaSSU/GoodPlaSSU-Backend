@@ -15,10 +15,10 @@ router.post('/', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-    const idToken = req.body.idToken;
+    const id_token = req.body.id_token;
 
     async function verify() {
-        const ticket = await client.verifyIdToken(idToken);
+        const ticket = await client.verifyIdToken(id_token);
         const payload = ticket.getPayload();
         const id = payload.sub; // 21자리의 Google 회원 id 번호 --> DB에 사용자 id로 넣기
 
