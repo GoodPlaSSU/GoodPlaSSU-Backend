@@ -14,6 +14,9 @@ const router = express.Router();
 router.post('/', (req, res) => {
     const idToken = req.body.idToken;
 
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
     async function verify() {
         const ticket = await client.verifyIdToken(idToken);
         const payload = ticket.getPayload();
