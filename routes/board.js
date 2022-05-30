@@ -7,6 +7,9 @@ const cloudinary = require('cloudinary').v2;
 // 게시판의 한 페이지에 해당하는 게시물 조회 API
 // request: tag, cursor (query string)
 router.get('/', (req,res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
     var responseData = {};
     const tag = req.query.tag;
     const cursor = req.query.cursor; // 직전에 받았던 게시물의 cursor
@@ -93,6 +96,9 @@ getImageUrl = (image) => {
 // request: user_key, content, image1, image2, image3, image4, tag (json)
 // request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장
 router.post('/', async(req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
     const sql1 = `select name, portrait 
                 from profile 
                 where id = ${req.body.user_key};`; // 작성자 이름, 프로필 사진 가져오는 쿼리
@@ -152,6 +158,9 @@ getDelImageUrl = (sql, index) => {
 // 수정 안된 값도 그대로 json 파일에 포함시켜 꼭 보내주기!
 // 안보내주면 자동으로 null 값으로 들어감.
 router.post('/:id', async(req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
     const id = req.params.id;
 
     const sql = `update board 
@@ -194,6 +203,9 @@ router.post('/:id', async(req, res) => {
 // 게시물 삭제 API
 // request: id (parameter values)
 router.delete('/:id', async(req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
     const id = req.params.id;
 
     const sql = `delete from board where id = ${id};`;

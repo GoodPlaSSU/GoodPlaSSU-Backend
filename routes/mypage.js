@@ -5,6 +5,9 @@ const pg = require('../db/index');
 // 사용자 정보 조회 API
 // request: id (parameter values) --> 없는 사용자일 경우 404 에러뜨기
 router.get('/user/:id', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
     var responseData = {};
     const id = req.params.id;
 
