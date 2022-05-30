@@ -26,11 +26,13 @@ router.post('/', (req, res) => {
 
             if (err) throw err;
             if (rows.rowCount > 0) { // DB에 있는 사용자
-                token = updateToken(payload);
+                //token = updateToken(payload);
             } else { // DB에 없는 사용자
-                token = insertUserIntoDB(payload);
+                //token = insertUserIntoDB(payload);
+                insertUserIntoDB(payload);
             }
-            res.status(200).send(token);
+            //res.status(200).send(token);
+            res.sendStatus(200);
         });
     }
     verify().then(() => {}).catch(console.error);
@@ -46,22 +48,23 @@ const updateToken = (payload) => {
     } = payload;
 
     // jwt token 생성
-    const token = jwt.sign({
-        id: sub,
-        name: name,
-        portrait: picture
-        },
-        JWT_SECRET
-    );
+//    const token = jwt.sign({
+//        id: sub,
+//        name: name,
+//        portrait: picture
+//        },
+//        JWT_SECRET
+//    );
 
     // DB의 token 업데이트
+    //const sql = `update profile set token = ${token} where id = ${sub};`;
     const sql = `update profile set token = ${token} where id = ${sub};`;
 
     pg.query(sql, (err) => {
         if (err) throw err;
     });
 
-    return token;
+    //return token;
 }
 
 
@@ -74,23 +77,25 @@ const insertUserIntoDB = (payload) => {
     } = payload;
 
     // jwt token 생성
-    const token = jwt.sign({
-        id: sub,
-        name: name,
-        portrait: picture
-        },
-        JWT_SECRET
-    );
+//    const token = jwt.sign({
+//        id: sub,
+//        name: name,
+//        portrait: picture
+//        },
+//        JWT_SECRET
+//    );
 
     // DB에 새 사용자 insert
-    const sql = `insert into profile (id, name, portrait, token) 
-                values (${sub}, ${name}, ${picture}, ${token});`;
+    //const sql = `insert into profile (id, name, portrait, token) 
+    //            values (${sub}, ${name}, ${picture}, ${token});`;
+    const sql = `insert into profile (id, name, portrait) 
+                values (${sub}, ${name}, ${picture});`;
     
     pg.query(sql, (err) => {
         if (err) throw err;
     });
 
-    return token;
+    //return token;
 }
 
 
