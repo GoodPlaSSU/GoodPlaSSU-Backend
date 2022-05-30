@@ -40,8 +40,8 @@ router.get('/', (req,res) => {
 // 요청 받은 ID의 게시물 조회 API (게시물 상세 조회 API)
 // request: id (parameter values)
 router.get('/:id', (req, res) => {
-    // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-    // res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
 
     var responseData = {};
     const id = req.params.id;
