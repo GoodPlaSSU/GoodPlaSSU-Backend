@@ -51,17 +51,13 @@ app.use('/monthPoint', monthPointRouter);
 app.use('/login', loginRouter);
 
 // CORS setting
-var whitelist = [ "http://localhost:3000", "https://goodplassu.herokuapp.com/" ]
-
-var corsOptions = {
-  origin: function(origin, callback) {
-    var isWhitelisted = whitelist.indexOf(origin) !== -1;
-    callback(null, isWhitelisted);
-  },
-  credentials: true
-}
-
-app.use(cors(corsOptions));
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  res.header("Access-Control-Allow-Methods", "POST, GET, DELETE");
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
