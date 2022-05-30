@@ -19,7 +19,8 @@ router.post('/', (req, res) => {
         const payload = ticket.getPayload();
         const id = payload.sub; // 21자리의 Google 회원 id 번호 --> DB에 사용자 id로 넣기
 
-        const sql = `select token from profile where id = ${id};`;
+        //const sql = `select token from profile where id = ${id};`;
+        const sql = `select token from profile where sub = ${id};`;
 
         pg.query(sql, (err, rows) => {
             var token = '';
@@ -58,7 +59,7 @@ const updateToken = (payload) => {
 
     // DB의 token 업데이트
     //const sql = `update profile set token = ${token} where id = ${sub};`;
-    const sql = `update profile set token = ${token} where id = ${sub};`;
+    const sql = `update profile set token = ${token} where sub = ${sub};`;
 
     pg.query(sql, (err) => {
         if (err) throw err;
@@ -88,7 +89,7 @@ const insertUserIntoDB = (payload) => {
     // DB에 새 사용자 insert
     //const sql = `insert into profile (id, name, portrait, token) 
     //            values (${sub}, ${name}, ${picture}, ${token});`;
-    const sql = `insert into profile (id, name, portrait) 
+    const sql = `insert into profile (sub, name, portrait) 
                 values (${sub}, ${name}, ${picture});`;
     
     pg.query(sql, (err) => {
