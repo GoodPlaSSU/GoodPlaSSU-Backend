@@ -12,10 +12,10 @@ const router = express.Router();
 // 1. 로그인 유저가 이미 DB에 있음 --> token만 업데이트
 // 2. 로그인 유저가 DB에 없음 --> DB에 유저 저장 / 새로 토큰을 만들어주고 돌려줌.
 router.post('/', (req, res) => {
-    const idToken = req.body.idToken;
-
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+    const idToken = req.body.idToken;
 
     async function verify() {
         const ticket = await client.verifyIdToken(idToken);
