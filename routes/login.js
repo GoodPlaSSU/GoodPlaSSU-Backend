@@ -1,106 +1,41 @@
-require('dotenv').config();
-const { OAuth2Client } = require('google-auth-library');
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-const jwt = require('jsonwebtoken');
 const express = require('express');
 const router = express.Router();
+const pg = require('../db/index');
 
-// 구글 로그인 연동 API
-// require: idToken
-// 구글에 idToken이 유효한지 체크
-// 유효: 구글에서 validate 응답 --> sendStatus(200)
-// 1. 로그인 유저가 이미 DB에 있음 --> token만 업데이트
-// 2. 로그인 유저가 DB에 없음 --> DB에 유저 저장 / 새로 토큰을 만들어주고 돌려줌.
+// POST로 받아오는 정보 : email(id), name, portrait
+// profile 테이블에서 email이 pk인 row 있는지 확인하고
+// 있으면 name과 portrait가 이전과 동일한지 확인해서 다르면 수정함
+// 없으면 테이블에 추가함
 router.post('/', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-    const id_token = req.body.id_token;
+    const sql1 = `select id, name, portrait from profile where id='${req.body.id}'`;
+    const sql2 = `insert into profile (id, name, portrait) values ($1, $2, $3)`;
 
-    async function verify() {
-        const ticket = await client.verifyIdToken(id_token);
-        const payload = ticket.getPayload();
-        const id = payload.sub; // 21자리의 Google 회원 id 번호 --> DB에 사용자 id로 넣기
-
-        //const sql = `select token from profile where id = ${id};`;
-        const sql = `select token from profile where sub = ${id};`;
-
-        pg.query(sql, (err, rows) => {
-            var token = '';
-
-            if (err) throw err;
-            if (rows.rowCount > 0) { // DB에 있는 사용자
-                //token = updateToken(payload);
-            } else { // DB에 없는 사용자
-                //token = insertUserIntoDB(payload);
-                insertUserIntoDB(payload);
+    pg.query(sql1, (err, rows) => {
+        if (err) throw err;
+        if (rows.rowCount) {    // 기존 유저
+            if (rows.rows.name !== req.body.name) { // 이름이 변경된 경우
+                const sqlName = `update profile set name='${req.body.name}' where id='${req.body.id}'`;
+                pg.query(sqlName, (err, rows) => {
+                    if (err) throw err;
+                });
             }
-            //res.status(200).send(token);
-            res.sendStatus(200);
-        });
-    }
-    verify().then(() => {}).catch(console.error);
-});
-
-
-// 1. DB에 있는 사용자 token 업데이트
-const updateToken = (payload) => {
-    const {
-        sub,
-        name,
-        picture
-    } = payload;
-
-    // jwt token 생성
-//    const token = jwt.sign({
-//        id: sub,
-//        name: name,
-//        portrait: picture
-//        },
-//        JWT_SECRET
-//    );
-
-    // DB의 token 업데이트
-    //const sql = `update profile set token = ${token} where id = ${sub};`;
-    const sql = `update profile set token = ${token} where sub = ${sub};`;
-
-    pg.query(sql, (err) => {
-        if (err) throw err;
+            if (rows.rows.portrait !== req.body.portrait) { // 프로필 이미지가 변경된 경우
+                const sqlPortrait = `update profile set portrait='${req.body.portrait}' where id='${req.body.id}'`;
+                pg.query(sqlPortrait, (err, rows) => {
+                    if (err) throw err;
+                });
+            }
+            res.sendStatus(201);
+        } else {    // 신규 유저
+            pg.query(sql2, [req.body.id, req.body.name, req.body.portrait], (err, rows) => {
+                if (err) throw err;
+                res.sendStatus(201);
+            });
+        }
     });
-
-    //return token;
-}
-
-
-// 2. DB에 없는 사용자 DB에 insert 및 토큰 생성
-const insertUserIntoDB = (payload) => {
-    const {
-        sub,
-        name,
-        picture
-    } = payload;
-
-    // jwt token 생성
-//    const token = jwt.sign({
-//        id: sub,
-//        name: name,
-//        portrait: picture
-//        },
-//        JWT_SECRET
-//    );
-
-    // DB에 새 사용자 insert
-    //const sql = `insert into profile (id, name, portrait, token) 
-    //            values (${sub}, ${name}, ${picture}, ${token});`;
-    const sql = `insert into profile (sub, name, portrait) 
-                values (${sub}, ${name}, ${picture});`;
-    
-    pg.query(sql, (err) => {
-        if (err) throw err;
-    });
-
-    //return token;
-}
-
+})
 
 module.exports = router;
