@@ -31,6 +31,9 @@ router.get('/user/:id', (req, res) => {
 // 내가 쓴 게시물 조회 API (10개씩)
 // request: id, cursor (query string)
 router.get('/mypost', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
     var responseData = {};
     const id = req.query.id;
     const cursor = req.query.cursor;
@@ -57,6 +60,9 @@ router.get('/mypost', (req, res) => {
 // 내가 댓글 쓴 게시물 조회 API (10개씩)
 // request: id, cursor (query string)
 router.get('/mycomment', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
     var responseData = {};
     const id = req.query.id;
     const cursor = req.query.cursor;
@@ -85,6 +91,9 @@ router.get('/mycomment', (req, res) => {
 // 내가 좋아요 누른 게시물 조회 API (10개씩)
 // request: id, cursor (query string)
 router.get('/mycheer', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
     var responseData = {};
     const id = req.query.id;
     const cursor = req.query.cursor;
