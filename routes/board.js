@@ -64,7 +64,7 @@ router.get('/:id', (req, res) => {
 
             const sql3 = `update profile
                         set total_point = total_point + 1, month_point = month_point + 1
-                        where id = ${rows[1].rows[0].user_key};`; // 작성자 선행 포인트 증가 쿼리
+                        where id = '${rows[1].rows[0].user_key}';`; // 작성자 선행 포인트 증가 쿼리
             
             pg.query(sql3, (err) => {
                 if (err) throw err;
