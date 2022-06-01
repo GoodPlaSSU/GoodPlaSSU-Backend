@@ -3,7 +3,10 @@ const router = express.Router();
 const pg = require('../db/index');
 
 router.get('/', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    var origin = req.getHeader("origin");
+    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
 	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 

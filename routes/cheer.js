@@ -9,7 +9,10 @@ const pg = require('../db/index');
 // isOn: false --> 삭제: board의 cheer_count 1 감소, cheer에서 is_on = false
 // 좋아요 처음 추가했을 때만 게시물 작성자의 선행포인트 1 증가
 router.post('/', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    var origin = req.getHeader("origin");
+    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 

@@ -8,7 +8,10 @@ const pg = require('../db/index');
 // maxPoint가 선행 포인트 최솟값(10)보다 작은 경우 result = 0만 response
 // 그 외에는 maxpoint 값을 가지고 있는 유저들의 name을 response
 router.get('/', async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    var origin = req.getHeader("origin");
+    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 

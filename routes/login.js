@@ -7,7 +7,10 @@ const pg = require('../db/index');
 // 있으면 name과 portrait가 이전과 동일한지 확인해서 다르면 수정함
 // 없으면 테이블에 추가함
 router.post('/', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    var origin = req.getHeader("origin");
+    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 

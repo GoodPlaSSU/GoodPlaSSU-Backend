@@ -5,7 +5,10 @@ const pg = require('../db/index');
 // 사용자 정보 조회 API
 // request: id (parameter values) --> 없는 사용자일 경우 404 에러뜨기
 router.get('/user/:id', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    var origin = req.getHeader("origin");
+    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
@@ -32,7 +35,10 @@ router.get('/user/:id', (req, res) => {
 // 내가 쓴 게시물 조회 API (10개씩)
 // request: id, cursor (query string)
 router.get('/mypost', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    var origin = req.getHeader("origin");
+    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
@@ -62,7 +68,10 @@ router.get('/mypost', (req, res) => {
 // 내가 댓글 쓴 게시물 조회 API (10개씩)
 // request: id, cursor (query string)
 router.get('/mycomment', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    var origin = req.getHeader("origin");
+    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
@@ -94,7 +103,10 @@ router.get('/mycomment', (req, res) => {
 // 내가 좋아요 누른 게시물 조회 API (10개씩)
 // request: id, cursor (query string)
 router.get('/mycheer', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    var origin = req.getHeader("origin");
+    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
