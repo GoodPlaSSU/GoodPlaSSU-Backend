@@ -6,6 +6,7 @@ const pg = require('../db/index');
 router.get('/', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
 	const id = req.query.id;	// url의 query string
 	var responseData = {};	// 여기에 전송할 데이터 저장
@@ -29,6 +30,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
 	// req.body로 프론트에서 submit한 값을 가져올 수 있음.
 	// 이를 data 변수에 저장하면,
@@ -51,6 +53,7 @@ router.post('/', (req, res) => {
 router.delete('/', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
 	const id = req.query.id;	// url의 query string
 	// ?id={id}일 때, comment 테이블에서 id가 {id}인 row 찾아서 삭제함

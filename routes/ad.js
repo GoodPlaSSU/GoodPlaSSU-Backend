@@ -4,7 +4,8 @@ const pg = require('../db/index');
 
 router.get('/', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
+	res.setHeader('Access-Control-Allow-Credentials', 'true');
+	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
 	var responseData = {};	// 여기에 전송할 데이터 저장
 

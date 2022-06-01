@@ -9,6 +9,7 @@ const cloudinary = require('cloudinary').v2;
 router.get('/', (req,res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     var responseData = {};
     const tag = req.query.tag;
@@ -45,6 +46,7 @@ router.get('/', (req,res) => {
 router.get('/:id', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     var responseData = {};
     const id = req.params.id;
@@ -98,6 +100,7 @@ getImageUrl = (image) => {
 router.post('/', async(req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     const sql1 = `select name, portrait 
                 from profile 
@@ -160,6 +163,7 @@ getDelImageUrl = (sql, index) => {
 router.post('/:id', async(req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     const id = req.params.id;
 
@@ -205,6 +209,7 @@ router.post('/:id', async(req, res) => {
 router.delete('/:id', async(req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     const id = req.params.id;
 

@@ -11,6 +11,7 @@ const pg = require('../db/index');
 router.post('/', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     const isOn = req.body.isOn;
     const user_key = req.body.user_key;

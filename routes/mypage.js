@@ -7,6 +7,7 @@ const pg = require('../db/index');
 router.get('/user/:id', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     var responseData = {};
     const id = req.params.id;
@@ -33,6 +34,7 @@ router.get('/user/:id', (req, res) => {
 router.get('/mypost', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     var responseData = {};
     const id = req.query.id;
@@ -62,6 +64,7 @@ router.get('/mypost', (req, res) => {
 router.get('/mycomment', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     var responseData = {};
     const id = req.query.id;
@@ -93,6 +96,7 @@ router.get('/mycomment', (req, res) => {
 router.get('/mycheer', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     var responseData = {};
     const id = req.query.id;

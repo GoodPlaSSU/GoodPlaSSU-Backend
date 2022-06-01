@@ -9,6 +9,7 @@ const pg = require('../db/index');
 router.post('/', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     const sql1 = `select id, name, portrait from profile where id='${req.body.id}'`;
     const sql2 = `insert into profile (id, name, portrait) values ($1, $2, $3)`;
