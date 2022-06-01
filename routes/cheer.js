@@ -22,14 +22,14 @@ router.post('/', (req, res) => {
                     where id = ${board_key};`; // 좋아요 수 증가 쿼리
         const sql2 = `select is_on
                     from cheer
-                    where user_key = ${user_key} and board_key = ${board_key};`; // 최초 추가인지 확인 쿼리
+                    where user_key = '${user_key}' and board_key = ${board_key};`; // 최초 추가인지 확인 쿼리
         
         pg.query(sql1+sql2, (err, rows) => {
             if (err) throw err;
             if (rows[1].rowCount) { // 최초 추가 X
                 const sql3 = `update cheer
                             set is_on = true
-                            where user_key = ${user_key} and board_key = ${board_key};`; // is_on 수정 쿼리
+                            where user_key = '${user_key}' and board_key = ${board_key};`; // is_on 수정 쿼리
                 
                 pg.query(sql3, (err) => {
                     if (err) throw err;
@@ -38,9 +38,9 @@ router.post('/', (req, res) => {
             } else { // 최초 추가 O
                 const sql3 = `update profile
                             set total_point = total_point + 1, month_point = month_point + 1
-                            where id = ${user_key};`; // 작성자 선행 포인트 증가 쿼리
+                            where id = '${user_key}';`; // 작성자 선행 포인트 증가 쿼리
                 const sql4 = `insert into cheer (user_key, board_key, is_on)
-                            values (${user_key}, ${board_key}, true);`; // 튜플 추가 쿼리
+                            values ('${user_key}', ${board_key}, true);`; // 튜플 추가 쿼리
 
                 pg.query(sql3+sql4, (err) => {
                     if (err) throw err;
@@ -54,7 +54,7 @@ router.post('/', (req, res) => {
                     where id = ${board_key} and cheer_count > 0;`; // 좋아요 수 감소 쿼리
         const sql2 = `update cheer
                     set is_on = false
-                    where user_key = ${user_key} and board_key = ${board_key};`; // is_on 수정 쿼리
+                    where user_key = ''${user_key}'' and board_key = ${board_key};`; // is_on 수정 쿼리
 
         pg.query(sql1+sql2, (err) => {
             if (err) throw err;
