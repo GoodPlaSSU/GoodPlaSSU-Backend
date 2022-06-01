@@ -3,6 +3,9 @@ const router = express.Router();
 const pg = require('../db/index');
 
 router.get('/', (req, res) => {
+	res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+	
 	var responseData = {};	// 여기에 전송할 데이터 저장
 
 	// ad 테이블에서 기관 광고 목록을 id 내림차순으로 보내줌
