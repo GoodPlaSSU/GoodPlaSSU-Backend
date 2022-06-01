@@ -23,7 +23,7 @@ router.get('/', (req,res) => {
     // 직전에 받았던 게시물의 cursor보다 작은 cursor를 가지는 게시물들은 좀 더 오래된 게시물들
     const sql = `select id, user_key, writer_name, writer_portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
                 from board
-                where tag = ${tag} and (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < ${cursor}
+                where tag = ${tag} and (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < '${cursor}'
                 order by cursor desc
                 limit 10;`;
 
@@ -101,10 +101,10 @@ router.post('/', async(req, res) => {
 
     const sql1 = `select name, portrait 
                 from profile 
-                where id = ${req.body.user_key};`; // 작성자 이름, 프로필 사진 가져오는 쿼리
+                where id = '${req.body.user_key}';`; // 작성자 이름, 프로필 사진 가져오는 쿼리
     const sql2 = `update profile
                 set total_point = total_point + 1, month_point = month_point + 1
-                where id = ${req.body.user_key};`; // 작성자 선행 포인트 증가 쿼리
+                where id = '${req.body.user_key}';`; // 작성자 선행 포인트 증가 쿼리
 
     // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
     // 만약 image1이 null이 아니면(이미지 파일이 들어왔으면),

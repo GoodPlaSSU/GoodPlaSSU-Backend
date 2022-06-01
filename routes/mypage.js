@@ -13,7 +13,7 @@ router.get('/user/:id', (req, res) => {
 
     const sql = `select name, portrait, total_point, month_point
                 from profile
-                where id = ${id};`;
+                where id = '${id}';`;
 
     pg.query(sql, (err, rows) => {
         if (err) throw err;
@@ -40,7 +40,7 @@ router.get('/mypost', (req, res) => {
 
     const sql = `select id, writer_name, writer_portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) as cursor
                 from board
-                where board.user_key = ${id} and (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) < ${cursor}
+                where board.user_key = '${id}' and (to_char(board.created_at, 'YYYYMMDDHH24MISS') || lpad(board.id::text, 10, '0')) < ${cursor}
                 order by cursor desc
                 limit 10;`;
     
@@ -71,7 +71,7 @@ router.get('/mycomment', (req, res) => {
                 from comment as c
                 inner join board as b
                 on b.id = c.board_key
-                where c.user_key = ${id} and (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) < ${cursor}
+                where c.user_key = '${id}' and (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) < ${cursor}
                 order by cursor desc
                 limit 10;`;
     
@@ -102,7 +102,7 @@ router.get('/mycheer', (req, res) => {
                 from cheer as c
                 inner join board as b
                 on b.id = c.board_key
-                where c.user_key = ${id} and c.is_on = true and (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) < ${cursor}
+                where c.user_key = '${id}' and c.is_on = true and (to_char(b.created_at, 'YYYYMMDDHH24MISS') || lpad(b.id::text, 10, '0')) < ${cursor}
                 order by cursor desc
                 limit 10;`;
     
