@@ -54,7 +54,7 @@ router.post('/', (req, res) => {
                     where id = ${board_key} and cheer_count > 0;`; // 좋아요 수 감소 쿼리
         const sql2 = `update cheer
                     set is_on = false
-                    where user_key = ''${user_key}'' and board_key = ${board_key};`; // is_on 수정 쿼리
+                    where user_key = '${user_key}' and board_key = ${board_key};`; // is_on 수정 쿼리
 
         pg.query(sql1+sql2, (err) => {
             if (err) throw err;
