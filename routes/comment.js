@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
 	var query = pg.query(sql, (err, rows) => {
 		if (err) throw err;
 		if (rows) {
-			responseData.result = 1;	// 프론트에서 값이 있는지 없는지 확인하기 위한 용도
+			responseData.result = rows.rowCount;	// 프론트에서 값이 있는지 없는지 확인하기 위한 용도
 			responseData.comments = rows.rows;
 		} else {
 			responseData.result = 0;
@@ -43,9 +43,9 @@ router.post('/', (req, res) => {
 	// comment 테이블에 data 변수에 저장된 value를 해당하는 속성값에 넣어줌
 	var query = pg.query(sql, [data.user_key, data.board_key, data.content], (err) => {
 		if (err) throw err;
+		// 저장이 잘 되었으면, res로 상태코드 201(Created)를 보내줌
+		res.sendStatus(201);
 	})
-	// 저장이 잘 되었으면, res로 상태코드 201(Created)를 보내줌
-	res.sendStatus(201);
 });
 
 router.delete('/', (req, res) => {
@@ -57,9 +57,9 @@ router.delete('/', (req, res) => {
 	const sql = `delete from comment where id=${id}`;
 	var query = pg.query(sql, (err) => {
 		if (err) throw err;
+		// 저장이 잘 되었으면, res로 상태코드 204(No Content)를 보내줌
+		res.sendStatus(204);
 	})
-	// 저장이 잘 되었으면, res로 상태코드 204(No Content)를 보내줌
-	res.sendStatus(204);
 });
 
 module.exports = router;

@@ -5,7 +5,7 @@ const pg = require('../db/index');
 router.get('/', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
-	
+
 	var responseData = {};	// 여기에 전송할 데이터 저장
 
 	// ad 테이블에서 기관 광고 목록을 id 내림차순으로 보내줌
@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 	var query = pg.query(sql, (err, rows) => {
 		if (err) throw err;
 		if (rows) {
-			responseData.result = 1;	// 프론트에서 값이 있는지 없는지 확인하기 위한 용도
+			responseData.result = rows.rowCount;	// 프론트에서 값이 있는지 없는지 확인하기 위한 용도
 			responseData.ads = rows.rows;
 		} else {
 			responseData.result = 0;
