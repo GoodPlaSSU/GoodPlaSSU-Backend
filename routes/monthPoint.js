@@ -3,11 +3,12 @@ const router = express.Router();
 const pg = require('../db/index');
 const cors = require('cors');
 
-var corsOptions = {
+const corsOptions = {
     origin: 'http://localhost:3000' || 'https://goodplassu.herokuapp.com',
     credentials : true,
     optionSuccessStatus: 200
 }
+
 // 이달의 선행왕 선정 API
 // require: 없음.
 // 유저가 없어서 maxPoint select 쿼리 결과가 없거나

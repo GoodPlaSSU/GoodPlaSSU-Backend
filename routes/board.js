@@ -4,7 +4,7 @@ const pg = require('../db/index');
 const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
 
-var corsOptions = {
+const corsOptions = {
     origin: 'http://localhost:3000' || 'https://goodplassu.herokuapp.com',
     credentials : true,
     optionSuccessStatus: 200
@@ -55,12 +55,12 @@ router.get('/', cors(corsOptions), (req,res) => {
 // 요청 받은 ID의 게시물 조회 API (게시물 상세 조회 API)
 // request: id (parameter values)
 router.get('/:id', cors(corsOptions), (req, res) => {
-    var origin = req.getHeader("origin");
-    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    // var origin = req.getHeader("origin");
+    // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+    //     res.setHeader('Access-Control-Allow-Origin', origin);
+    // }
+    // res.setHeader('Access-Control-Allow-Credentials', 'true');
+    // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     var responseData = {};
     const id = req.params.id;
@@ -112,12 +112,12 @@ getImageUrl = (image) => {
 // request: user_key, content, image1, image2, image3, image4, tag (json)
 // request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장
 router.post('/', cors(corsOptions), async(req, res) => {
-    var origin = req.getHeader("origin");
-    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    // var origin = req.getHeader("origin");
+    // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+    //     res.setHeader('Access-Control-Allow-Origin', origin);
+    // }
+    // res.setHeader('Access-Control-Allow-Credentials', 'true');
+    // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     const sql1 = `select name, portrait 
                 from profile 

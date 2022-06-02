@@ -2,14 +2,20 @@ const express = require('express');
 const router = express.Router();
 const pg = require('../db/index');
 
+const corsOptions = {
+    origin: 'http://localhost:3000' || 'https://goodplassu.herokuapp.com',
+    credentials : true,
+    optionSuccessStatus: 200
+}
+
 // query string으로 받은 id에 해당하는 게시글에 달린 댓글들 보내주는 api
-router.get('/', (req, res) => {
-    var origin = req.getHeader("origin");
-    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+router.get('/', cors(corsOptions), (req, res) => {
+    // var origin = req.getHeader("origin");
+    // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+    //     res.setHeader('Access-Control-Allow-Origin', origin);
+    // }
+    // res.setHeader('Access-Control-Allow-Credentials', 'true');
+    // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
 	const id = req.query.id;	// url의 query string
 	var responseData = {};	// 여기에 전송할 데이터 저장
