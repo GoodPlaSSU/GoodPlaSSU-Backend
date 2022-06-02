@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pg = require('../db/index');
+const cors = require('cors');
 
 const corsOptions = {
     origin: 'http://localhost:3000' || 'https://goodplassu.herokuapp.com',
