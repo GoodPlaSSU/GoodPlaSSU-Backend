@@ -6,6 +6,7 @@ const cors = require('cors');
 const corsOptions = {
     origin: 'http://localhost:3000' || 'https://goodplassu.herokuapp.com',
     credentials : true,
+	methods : 'GET,POST,DELETE,OPTIONS',
     optionSuccessStatus: 200
 }
 
