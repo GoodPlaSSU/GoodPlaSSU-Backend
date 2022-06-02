@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
     }
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-
+  
     var responseData = {};
 
     const sql1 = `select max(month_point) from profile;`; // 선행 포인트 최댓값 select 쿼리

@@ -2,45 +2,48 @@ const express = require('express');
 const router = express.Router();
 const pg = require('../db/index');
 const cloudinary = require('cloudinary').v2;
+const cors = require('cors');
 
 
 // 게시판의 한 페이지에 해당하는 게시물 조회 API
 // request: tag, cursor (query string)
-router.get('/', (req,res) => {
-    var origin = req.getHeader("origin");
-    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+router.get('/', cors(), (req,res) => {
+    try {
+        // var origin = req.getHeader("Origin");
+        // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+        //     res.setHeader('Access-Control-Allow-Origin', origin);
+        // }
+        // res.setHeader('Access-Control-Allow-Credentials', 'true');
+        // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
-    var responseData = {};
-    const tag = req.query.tag;
-    const cursor = req.query.cursor; // 직전에 받았던 게시물의 cursor
+        var responseData = {};
+        const tag = req.query.tag;
+        const cursor = req.query.cursor; // 직전에 받았던 게시물의 cursor
 
-    // cursor 기반 페이지네이션
-    // 클라이언트가 가져간 마지막 row의 순서상 다음 row들을 10개 요청/응답하게 구현
-    // 기준: cursor
-    // cursor: created_at(14자) + id(10자) --> 24자 string
-    // 가장 최근 게시물 10개를 받고 싶다면 cursor를 '999999999999999999999999'를 보내주면 됨.(9가 24개)
-    // cursor가 클수록 최근 게시물
-    // 직전에 받았던 게시물의 cursor보다 작은 cursor를 가지는 게시물들은 좀 더 오래된 게시물들
-    const sql = `select id, user_key, writer_name, writer_portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
-                from board
-                where tag = ${tag} and (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < '${cursor}'
-                order by cursor desc
-                limit 10;`;
+        // cursor 기반 페이지네이션
+        // 클라이언트가 가져간 마지막 row의 순서상 다음 row들을 10개 요청/응답하게 구현
+        // 기준: cursor
+        // cursor: created_at(14자) + id(10자) --> 24자 string
+        // 가장 최근 게시물 10개를 받고 싶다면 cursor를 '999999999999999999999999'를 보내주면 됨.(9가 24개)
+        // cursor가 클수록 최근 게시물
+        // 직전에 받았던 게시물의 cursor보다 작은 cursor를 가지는 게시물들은 좀 더 오래된 게시물들
+        const sql = `select id, user_key, writer_name, writer_portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
+                    from board
+                    where tag = ${tag} and (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < '${cursor}'
+                    order by cursor desc
+                    limit 10;`;
 
-    pg.query(sql, (err, rows) => {
-        if (err) throw err;
-        if (rows) {
-            responseData.result = rows.rowCount;
-            responseData.post = rows.rows;
-        } else {
-            responseData.result = 0;
-        }
-        res.status(200).json(responseData);
-    });   
+        pg.query(sql, (err, rows) => {
+            if (err) throw err;
+            if (rows) {
+                responseData.result = rows.rowCount;
+                responseData.post = rows.rows;
+            } else {
+                responseData.result = 0;
+            }
+            res.status(200).json(responseData);
+        });   
+    } catch(exception) { console.log(exception);}
 });
 
 
