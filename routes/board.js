@@ -113,6 +113,8 @@ getImageUrl = (image) => {
 // request: user_key, content, image1, image2, image3, image4, tag (json)
 // request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장
 router.options('/', cors(corsOptions), async(req, res) => {
+    res.sendStatus(200);
+    
     router.post('/', cors(corsOptions), async(req, res) => {
         // var origin = req.getHeader("origin");
         // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
