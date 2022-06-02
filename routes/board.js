@@ -5,7 +5,7 @@ const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
 
 const corsOptions = {
-    origin: 'http://localhost:3000' || 'https://goodplassu.herokuapp.com',
+    origin: ["http://localhost:3000", "https://localhost:3000", "http://goodplassu.herokuapp.com", "https://goodplassu.herokuapp.com"],
     credentials : true,
     methods : 'GET,POST,DELETE,OPTIONS',
     optionSuccessStatus: 200
