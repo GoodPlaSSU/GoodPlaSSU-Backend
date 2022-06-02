@@ -4,10 +4,13 @@ const pg = require('../db/index');
 const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
 
-
+var corsOptions = {
+    origin: 'http://localhost:3000' || 'https://goodplassu.herokuapp.com',
+    optionSuccessStatus: 200
+}
 // 게시판의 한 페이지에 해당하는 게시물 조회 API
 // request: tag, cursor (query string)
-router.get('/', cors(), (req,res) => {
+router.get('/', cors(corsOptions), (req,res) => {
     try {
         // var origin = req.getHeader("Origin");
         // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
