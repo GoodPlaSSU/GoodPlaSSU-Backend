@@ -10,15 +10,9 @@ const corsOptions = {
     optionSuccessStatus: 200
 }
 
+
 // query string으로 받은 id에 해당하는 게시글에 달린 댓글들 보내주는 api
 router.get('/', cors(corsOptions), (req, res) => {
-    // var origin = req.getHeader("origin");
-    // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-    //     res.setHeader('Access-Control-Allow-Origin', origin);
-    // }
-    // res.setHeader('Access-Control-Allow-Credentials', 'true');
-    // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-
 	const id = req.query.id;	// url의 query string
 	var responseData = {};	// 여기에 전송할 데이터 저장
 
@@ -38,15 +32,15 @@ router.get('/', cors(corsOptions), (req, res) => {
 	})
 });
 
-router.post('/', (req, res) => {
-    var origin = req.getHeader("origin");
-    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
-	// req.body로 프론트에서 submit한 값을 가져올 수 있음.
+// 댓글 작성, 삭제 API - cors preflight 처리 라우터
+router.options('/', cors(corsOptions), (req, res) => {
+	res.sendStatus(200);
+ });
+
+
+router.post('/', cors(corsOptions), (req, res) => {
+  	// req.body로 프론트에서 submit한 값을 가져올 수 있음.
 	// 이를 data 변수에 저장하면,
 	// [Object: null prototype] {
 	// 	user_key: '1',
@@ -64,14 +58,8 @@ router.post('/', (req, res) => {
 	})
 });
 
-router.delete('/', (req, res) => {
-    var origin = req.getHeader("origin");
-    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
+router.delete('/', cors(corsOptions), (req, res) => {
 	const id = req.query.id;	// url의 query string
 	// ?id={id}일 때, comment 테이블에서 id가 {id}인 row 찾아서 삭제함
 	const sql = `delete from comment where id=${id}`;

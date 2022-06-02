@@ -4,21 +4,8 @@ const pg = require('../db/index');
 const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
 
-// const allowlist = ['http://localhost:3000', 'https://localhost:3000', 'http://goodplassu.herokuapp.com', 'https://goodplassu.herokuapp.com'];
-// var corsOptionsDelegate = function (req, callback) {
-//     var corsOptions = {
-//         credentials : true, 
-//         methods : 'GET,POST,DELETE,OPTIONS', 
-//         optionSuccessStatus: 200
-//     };
 
-//     if (allowlist.indexOf(req.header('Origin')) !== -1) {
-//       corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
-//     } else {
-//       corsOptions = { origin: false } // disable CORS for this request
-//     }
-//     callback(null, corsOptions) // callback expects two parameters: error and options
-//   }
+// cors 옵션 설정
 const corsOptions = {
     origin: ["http://localhost:3000", "https://localhost:3000", "http://goodplassu.herokuapp.com", "https://goodplassu.herokuapp.com"],
     credentials : true,
@@ -26,58 +13,43 @@ const corsOptions = {
     optionSuccessStatus: 200
 }
 
+
 // 게시판의 한 페이지에 해당하는 게시물 조회 API
 // request: tag, cursor (query string)
 router.get('/', cors(corsOptions), (req,res) => {
-    try {
-        // var origin = req.getHeader("Origin");
-        // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-        //     res.setHeader('Access-Control-Allow-Origin', origin);
-        // }
-        // res.setHeader('Access-Control-Allow-Credentials', 'true');
-        // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    var responseData = {};
+    const tag = req.query.tag;
+    const cursor = req.query.cursor; // 직전에 받았던 게시물의 cursor
 
-        var responseData = {};
-        const tag = req.query.tag;
-        const cursor = req.query.cursor; // 직전에 받았던 게시물의 cursor
+    // cursor 기반 페이지네이션
+    // 클라이언트가 가져간 마지막 row의 순서상 다음 row들을 10개 요청/응답하게 구현
+    // 기준: cursor
+    // cursor: created_at(14자) + id(10자) --> 24자 string
+    // 가장 최근 게시물 10개를 받고 싶다면 cursor를 '999999999999999999999999'를 보내주면 됨.(9가 24개)
+    // cursor가 클수록 최근 게시물
+    // 직전에 받았던 게시물의 cursor보다 작은 cursor를 가지는 게시물들은 좀 더 오래된 게시물들
+    const sql = `select id, user_key, writer_name, writer_portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
+                from board
+                where tag = ${tag} and (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < '${cursor}'
+                order by cursor desc
+                limit 10;`;
 
-        // cursor 기반 페이지네이션
-        // 클라이언트가 가져간 마지막 row의 순서상 다음 row들을 10개 요청/응답하게 구현
-        // 기준: cursor
-        // cursor: created_at(14자) + id(10자) --> 24자 string
-        // 가장 최근 게시물 10개를 받고 싶다면 cursor를 '999999999999999999999999'를 보내주면 됨.(9가 24개)
-        // cursor가 클수록 최근 게시물
-        // 직전에 받았던 게시물의 cursor보다 작은 cursor를 가지는 게시물들은 좀 더 오래된 게시물들
-        const sql = `select id, user_key, writer_name, writer_portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
-                    from board
-                    where tag = ${tag} and (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < '${cursor}'
-                    order by cursor desc
-                    limit 10;`;
-
-        pg.query(sql, (err, rows) => {
-            if (err) throw err;
-            if (rows) {
-                responseData.result = rows.rowCount;
-                responseData.post = rows.rows;
-            } else {
-                responseData.result = 0;
-            }
-            res.status(200).json(responseData);
-        });   
-    } catch(exception) { console.log(exception);}
+    pg.query(sql, (err, rows) => {
+        if (err) throw err;
+        if (rows) {
+            responseData.result = rows.rowCount;
+            responseData.post = rows.rows;
+        } else {
+            responseData.result = 0;
+        }
+        res.status(200).json(responseData);
+    });   
 });
 
 
 // 요청 받은 ID의 게시물 조회 API (게시물 상세 조회 API)
 // request: id (parameter values)
 router.get('/:id', cors(corsOptions), (req, res) => {
-    // var origin = req.getHeader("origin");
-    // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-    //     res.setHeader('Access-Control-Allow-Origin', origin);
-    // }
-    // res.setHeader('Access-Control-Allow-Credentials', 'true');
-    // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-
     var responseData = {};
     const id = req.params.id;
 
@@ -124,21 +96,16 @@ getImageUrl = (image) => {
 }
 
 
-// 게시물 생성 API
-// request: user_key, content, image1, image2, image3, image4, tag (json)
-// request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장
+// 게시물 생성 API - cors preflight 처리 라우터
 router.options('/', cors(corsOptions), async(req, res) => {
    res.sendStatus(200);
 });
-    
-router.post('/', cors(corsOptions), async(req, res) => {
-    // var origin = req.getHeader("origin");
-    // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-    //     res.setHeader('Access-Control-Allow-Origin', origin);
-    // }
-    // res.setHeader('Access-Control-Allow-Credentials', 'true');
-    // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
+
+// 게시물 생성 API
+// request: user_key, content, image1, image2, image3, image4, tag (json)
+// request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장    
+router.post('/', cors(corsOptions), async(req, res) => {
     const sql1 = `select name, portrait 
                 from profile 
                 where id = '${req.body.user_key}';`; // 작성자 이름, 프로필 사진 가져오는 쿼리
@@ -193,18 +160,17 @@ getDelImageUrl = (sql, index) => {
 }
 
 
+// 게시물 수정, 삭제 API - cors preflight 처리 라우터
+router.options('/:id', cors(corsOptions), async(req, res) => {
+    res.sendStatus(200);
+ });
+
+
 // 게시물 수정 API
 // request: content, image1, image2, image3, image4 (json)
 // 수정 안된 값도 그대로 json 파일에 포함시켜 꼭 보내주기!
 // 안보내주면 자동으로 null 값으로 들어감.
-router.post('/:id', async(req, res) => {
-    var origin = req.getHeader("origin");
-    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-
+router.post('/:id', cors(corsOptions), async(req, res) => {
     const id = req.params.id;
 
     const sql = `update board 
@@ -246,14 +212,7 @@ router.post('/:id', async(req, res) => {
 
 // 게시물 삭제 API
 // request: id (parameter values)
-router.delete('/:id', async(req, res) => {
-    var origin = req.getHeader("origin");
-    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-
+router.delete('/:id', cors(corsOptions), async(req, res) => {
     const id = req.params.id;
 
     const sql = `delete from board where id = ${id};`;

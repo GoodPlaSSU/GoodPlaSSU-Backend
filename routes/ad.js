@@ -1,15 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const pg = require('../db/index');
+const cors = require('cors');
 
-router.get('/', (req, res) => {
-    var origin = req.getHeader("origin");
-    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-	res.setHeader('Access-Control-Allow-Credentials', 'true');
-	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
+// cors 옵션 설정
+const corsOptions = {
+    origin: ["http://localhost:3000", "https://localhost:3000", "http://goodplassu.herokuapp.com", "https://goodplassu.herokuapp.com"],
+    credentials : true,
+    methods : 'GET,POST,DELETE,OPTIONS',
+    optionSuccessStatus: 200
+}
+
+
+router.get('/', cors(corsOptions), (req, res) => {
 	var responseData = {};	// 여기에 전송할 데이터 저장
 
 	// ad 테이블에서 기관 광고 목록을 id 내림차순으로 보내줌
