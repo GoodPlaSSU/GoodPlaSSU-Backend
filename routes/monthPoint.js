@@ -1,19 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const pg = require('../db/index');
+const cors = require('cors');
 
 // 이달의 선행왕 선정 API
 // require: 없음.
 // 유저가 없어서 maxPoint select 쿼리 결과가 없거나
 // maxPoint가 선행 포인트 최솟값(10)보다 작은 경우 result = 0만 response
 // 그 외에는 maxpoint 값을 가지고 있는 유저들의 name을 response
-router.get('/', async (req, res) => {
-    var origin = req.getHeader("origin");
-    if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+router.get('/', cors(), async (req, res) => {
+    // var origin = req.getHeader("origin");
+    // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+    //     res.setHeader('Access-Control-Allow-Origin', origin);
+    // }
+    // res.setHeader('Access-Control-Allow-Credentials', 'true');
+    // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   
     var responseData = {};
 
