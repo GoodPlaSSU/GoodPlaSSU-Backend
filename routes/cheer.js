@@ -19,12 +19,12 @@ router.options('/', cors(corsOptions), (req, res) => {
     res.sendStatus(200);
 
     router.post('/', cors(corsOptions), (req, res) => {
-        var origin = req.getHeader("origin");
-        if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-            res.setHeader('Access-Control-Allow-Origin', origin);
-        }
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        // var origin = req.getHeader("origin");
+        // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+        //     res.setHeader('Access-Control-Allow-Origin', origin);
+        // }
+        // res.setHeader('Access-Control-Allow-Credentials', 'true');
+        // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
         const isOn = req.body.isOn;
         const user_key = req.body.user_key;
