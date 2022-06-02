@@ -103,7 +103,7 @@ getImageUrl = (image) => {
 // 게시물 생성 API
 // request: user_key, content, image1, image2, image3, image4, tag (json)
 // request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장
-router.options('/', async(req,res) => {
+router.options('/', async(req, res) => {
     var origin = req.getHeader("origin");
     if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
         res.setHeader('Access-Control-Allow-Origin', origin);
@@ -111,7 +111,7 @@ router.options('/', async(req,res) => {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.sendStatus(200);
-    
+
     router.post('/', async(req, res) => {
         var origin = req.getHeader("origin");
         if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
