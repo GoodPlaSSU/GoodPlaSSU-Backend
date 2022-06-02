@@ -5,6 +5,7 @@ const cors = require('cors');
 
 var corsOptions = {
     origin: 'http://localhost:3000' || 'https://goodplassu.herokuapp.com',
+    credentials : true,
     optionSuccessStatus: 200
 }
 // 이달의 선행왕 선정 API

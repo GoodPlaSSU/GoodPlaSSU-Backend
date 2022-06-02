@@ -6,6 +6,7 @@ const cors = require('cors');
 
 var corsOptions = {
     origin: 'http://localhost:3000' || 'https://goodplassu.herokuapp.com',
+    credentials : true,
     optionSuccessStatus: 200
 }
 // 게시판의 한 페이지에 해당하는 게시물 조회 API
