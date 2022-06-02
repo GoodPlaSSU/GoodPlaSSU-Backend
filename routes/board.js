@@ -4,31 +4,31 @@ const pg = require('../db/index');
 const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
 
-const allowlist = ['http://localhost:3000', 'https://localhost:3000', 'http://goodplassu.herokuapp.com', 'https://goodplassu.herokuapp.com'];
-var corsOptionsDelegate = function (req, callback) {
-    var corsOptions = {
-        credentials : true, 
-        methods : 'GET,POST,DELETE,OPTIONS', 
-        optionSuccessStatus: 200
-    };
+// const allowlist = ['http://localhost:3000', 'https://localhost:3000', 'http://goodplassu.herokuapp.com', 'https://goodplassu.herokuapp.com'];
+// var corsOptionsDelegate = function (req, callback) {
+//     var corsOptions = {
+//         credentials : true, 
+//         methods : 'GET,POST,DELETE,OPTIONS', 
+//         optionSuccessStatus: 200
+//     };
 
-    if (allowlist.indexOf(req.header('Origin')) !== -1) {
-      corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
-    } else {
-      corsOptions = { origin: false } // disable CORS for this request
-    }
-    callback(null, corsOptions) // callback expects two parameters: error and options
-  }
-// const corsOptions = {
-//     origin: ["http://localhost:3000", "https://localhost:3000", "http://goodplassu.herokuapp.com", "https://goodplassu.herokuapp.com"],
-//     credentials : true,
-//     methods : 'GET,POST,DELETE,OPTIONS',
-//     optionSuccessStatus: 200
-// }
+//     if (allowlist.indexOf(req.header('Origin')) !== -1) {
+//       corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+//     } else {
+//       corsOptions = { origin: false } // disable CORS for this request
+//     }
+//     callback(null, corsOptions) // callback expects two parameters: error and options
+//   }
+const corsOptions = {
+    origin: ["http://localhost:3000", "https://localhost:3000", "http://goodplassu.herokuapp.com", "https://goodplassu.herokuapp.com"],
+    credentials : true,
+    methods : 'GET,POST,DELETE,OPTIONS',
+    optionSuccessStatus: 200
+}
 
 // 게시판의 한 페이지에 해당하는 게시물 조회 API
 // request: tag, cursor (query string)
-router.get('/', cors(corsOptionsDelegate), (req,res) => {
+router.get('/', cors(corsOptions), (req,res) => {
     try {
         // var origin = req.getHeader("Origin");
         // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
@@ -70,7 +70,7 @@ router.get('/', cors(corsOptionsDelegate), (req,res) => {
 
 // 요청 받은 ID의 게시물 조회 API (게시물 상세 조회 API)
 // request: id (parameter values)
-router.get('/:id', cors(corsOptionsDelegate), (req, res) => {
+router.get('/:id', cors(corsOptions), (req, res) => {
     // var origin = req.getHeader("origin");
     // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
     //     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -127,11 +127,11 @@ getImageUrl = (image) => {
 // 게시물 생성 API
 // request: user_key, content, image1, image2, image3, image4, tag (json)
 // request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장
-router.options('/', cors(corsOptionsDelegate), async(req, res) => {
+router.options('/', cors(corsOptions), async(req, res) => {
    res.sendStatus(200);
 });
     
-router.post('/', cors(corsOptionsDelegate), async(req, res) => {
+router.post('/', cors(corsOptions), async(req, res) => {
     // var origin = req.getHeader("origin");
     // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
     //     res.setHeader('Access-Control-Allow-Origin', origin);
