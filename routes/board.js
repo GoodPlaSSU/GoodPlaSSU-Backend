@@ -4,16 +4,31 @@ const pg = require('../db/index');
 const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
 
-const corsOptions = {
-    origin: ["http://localhost:3000", "https://localhost:3000", "http://goodplassu.herokuapp.com", "https://goodplassu.herokuapp.com"],
-    credentials : true,
-    methods : 'GET,POST,DELETE,OPTIONS',
-    optionSuccessStatus: 200
-}
+const allowlist = ['http://localhost:3000', 'https://localhost:3000', 'http://goodplassu.herokuapp.com', 'https://goodplassu.herokuapp.com'];
+var corsOptionsDelegate = function (req, callback) {
+    var corsOptions = {
+        credentials : true, 
+        methods : 'GET,POST,DELETE,OPTIONS', 
+        optionSuccessStatus: 200
+    };
+
+    if (allowlist.indexOf(req.header('Origin')) !== -1) {
+      corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+    } else {
+      corsOptions = { origin: false } // disable CORS for this request
+    }
+    callback(null, corsOptions) // callback expects two parameters: error and options
+  }
+// const corsOptions = {
+//     origin: ["http://localhost:3000", "https://localhost:3000", "http://goodplassu.herokuapp.com", "https://goodplassu.herokuapp.com"],
+//     credentials : true,
+//     methods : 'GET,POST,DELETE,OPTIONS',
+//     optionSuccessStatus: 200
+// }
 
 // 게시판의 한 페이지에 해당하는 게시물 조회 API
 // request: tag, cursor (query string)
-router.get('/', cors(corsOptions), (req,res) => {
+router.get('/', cors(corsOptionsDelegate), (req,res) => {
     try {
         // var origin = req.getHeader("Origin");
         // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
@@ -55,7 +70,7 @@ router.get('/', cors(corsOptions), (req,res) => {
 
 // 요청 받은 ID의 게시물 조회 API (게시물 상세 조회 API)
 // request: id (parameter values)
-router.get('/:id', cors(corsOptions), (req, res) => {
+router.get('/:id', cors(corsOptionsDelegate), (req, res) => {
     // var origin = req.getHeader("origin");
     // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
     //     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -112,48 +127,48 @@ getImageUrl = (image) => {
 // 게시물 생성 API
 // request: user_key, content, image1, image2, image3, image4, tag (json)
 // request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장
-router.options('/', cors(corsOptions), async(req, res) => {
-    res.sendStatus(200);
+router.options('/', cors(corsOptionsDelegate), async(req, res) => {
+   res.sendStatus(200);
+});
     
-    router.post('/', cors(corsOptions), async(req, res) => {
-        // var origin = req.getHeader("origin");
-        // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
-        //     res.setHeader('Access-Control-Allow-Origin', origin);
-        // }
-        // res.setHeader('Access-Control-Allow-Credentials', 'true');
-        // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+router.post('/', cors(corsOptionsDelegate), async(req, res) => {
+    // var origin = req.getHeader("origin");
+    // if (origin === "http://localhost:3000" || origin === "https://goodplassu.herokuapp.com") {
+    //     res.setHeader('Access-Control-Allow-Origin', origin);
+    // }
+    // res.setHeader('Access-Control-Allow-Credentials', 'true');
+    // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
-        const sql1 = `select name, portrait 
-                    from profile 
-                    where id = '${req.body.user_key}';`; // 작성자 이름, 프로필 사진 가져오는 쿼리
-        const sql2 = `update profile
-                    set total_point = total_point + 1, month_point = month_point + 1
-                    where id = '${req.body.user_key}';`; // 작성자 선행 포인트 증가 쿼리
+    const sql1 = `select name, portrait 
+                from profile 
+                where id = '${req.body.user_key}';`; // 작성자 이름, 프로필 사진 가져오는 쿼리
+    const sql2 = `update profile
+                set total_point = total_point + 1, month_point = month_point + 1
+                where id = '${req.body.user_key}';`; // 작성자 선행 포인트 증가 쿼리
 
-        // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
-        // 만약 image1이 null이 아니면(이미지 파일이 들어왔으면),
-        // cloudinary에 이미지를 업로드하고 업로드 된 그 이미지의 secure_url을 받아옴.
-        var imageUrls = {};
-        if (req.body.image1)
-            imageUrls.image1 = await getImageUrl(req.body.image1);
-        if (req.body.image2)
-            imageUrls.image2 = await getImageUrl(req.body.image2);
-        if (req.body.image3)
-            imageUrls.image3 = await getImageUrl(req.body.image3);
-        if (req.body.image4)
-            imageUrls.image4 = await getImageUrl(req.body.image4);
+    // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
+    // 만약 image1이 null이 아니면(이미지 파일이 들어왔으면),
+    // cloudinary에 이미지를 업로드하고 업로드 된 그 이미지의 secure_url을 받아옴.
+    var imageUrls = {};
+    if (req.body.image1)
+        imageUrls.image1 = await getImageUrl(req.body.image1);
+    if (req.body.image2)
+        imageUrls.image2 = await getImageUrl(req.body.image2);
+    if (req.body.image3)
+        imageUrls.image3 = await getImageUrl(req.body.image3);
+    if (req.body.image4)
+        imageUrls.image4 = await getImageUrl(req.body.image4);
 
-        pg.query(sql1+sql2, (err, rows) => {
+    pg.query(sql1+sql2, (err, rows) => {
+        if (err) throw err;
+
+        const sql3 = `insert into board (user_key, content, image1, image2, image3, image4, tag, writer_name, writer_portrait) 
+                    values ($1, $2, $3, $4, $5, $6, $7, $8, $9);`;
+        const dbInput = [req.body.user_key, req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4, req.body.tag, rows[0].rows[0].name, rows[0].rows[0].portrait];
+
+        pg.query(sql3, dbInput, (err) => {
             if (err) throw err;
-
-            const sql3 = `insert into board (user_key, content, image1, image2, image3, image4, tag, writer_name, writer_portrait) 
-                        values ($1, $2, $3, $4, $5, $6, $7, $8, $9);`;
-            const dbInput = [req.body.user_key, req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4, req.body.tag, rows[0].rows[0].name, rows[0].rows[0].portrait];
-
-            pg.query(sql3, dbInput, (err) => {
-                if (err) throw err;
-                res.sendStatus(201);
-            });
+            res.sendStatus(201);
         });
     });
 });
