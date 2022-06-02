@@ -131,7 +131,7 @@ router.post('/', cors(corsOptions), async(req, res) => {
 
         const sql3 = `insert into board (user_key, content, image1, image2, image3, image4, tag, writer_name, writer_portrait) 
                     values ($1, $2, $3, $4, $5, $6, $7, $8, $9);`;
-        const dbInput = [req.body.user_key, req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4, req.body.tag, rows[0].rows[0].name, rows[0].rows[0].portrait];
+        const dbInput = [req.body.user_key, req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4, req.body.tag, rows[0].rows[0]['name'], rows[0].rows[0]['portrait']];
 
         pg.query(sql3, dbInput, (err) => {
             if (err) throw err;
