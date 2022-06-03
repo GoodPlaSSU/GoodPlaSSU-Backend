@@ -86,7 +86,7 @@ router.get('/', cors(corsOptions), (req, res) => {
 
     const sql = `select is_on
                 from cheer
-                where user_key = ${user_key} and board_key = ${board_key};`;
+                where user_key = '${user_key}' and board_key = ${board_key};`;
 
     pg.query(sql, (err, rows) => {
         if (err) throw err;
