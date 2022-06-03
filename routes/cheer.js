@@ -74,4 +74,30 @@ router.post('/', cors(corsOptions), (req, res) => {
     }
 });
 
+
+// 좋아요 체크 여부 확인 API
+// request: user_key, board_key (query string)
+// response: is_on (json)
+// 사용자가 해당 게시물에 좋아요를 눌렀는지 cheer table의 is_on 값으로 확인한다.
+router.get('/', cors(corsOptions), (req, res) => {
+    var responseData = {};
+    const user_key = req.query.user_key;
+    const board_key = req.query.board_key;
+
+    const sql = `select is_on
+                from cheer
+                where user_key = ${user_key} and board_key = ${board_key};`;
+
+    pg.query(sql, (err, rows) => {
+        if (err) throw err;
+        if (rows.rowCount != 0) { // 좋아요 추가/취소 기록이 있는 경우 --> 기록 따라 전송
+            responseData.is_on = rows.rows[0]['is_on'];
+        } else { // 좋아요 추가/취소 기록이 없는 경우 --> 좋아요 누른 적이 없음.(false 전송)
+            responseData.is_on = false;
+        }
+        res.status(200).json(responseData);
+    });
+});
+
+
 module.exports = router;
