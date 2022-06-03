@@ -118,7 +118,7 @@ getImageUrl = (image) => {
 // request: user_key, content, tag (json)
 // response: id (json)
 // request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장    
-router.post('/', multipartMiddleware, cors(corsOptions), async(req, res) => {
+router.post('/', cors(corsOptions), (req, res) => {
     var responseData = {};
 
     const sql1 = `select name, portrait 
