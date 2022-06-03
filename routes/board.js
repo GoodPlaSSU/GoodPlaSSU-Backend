@@ -33,70 +33,113 @@ router.options('/:id', cors(corsOptions), async(req, res) => {
 
 
 // 게시판의 한 페이지에 해당하는 게시물 조회 API
-// request: tag, cursor (query string)
-router.get('/', cors(corsOptions), (req,res) => {
+// request: user_key, tag, cursor (query string)
+router.get('/', cors(corsOptions), async(req,res) => {
     var responseData = {};
+    const user_key = req.query.user_key;
     const tag = req.query.tag;
     const cursor = req.query.cursor; // 직전에 받았던 게시물의 cursor
 
-    // cursor 기반 페이지네이션
-    // 클라이언트가 가져간 마지막 row의 순서상 다음 row들을 10개 요청/응답하게 구현
-    // 기준: cursor
-    // cursor: created_at(14자) + id(10자) --> 24자 string
-    // 가장 최근 게시물 10개를 받고 싶다면 cursor를 '999999999999999999999999'를 보내주면 됨.(9가 24개)
-    // cursor가 클수록 최근 게시물
-    // 직전에 받았던 게시물의 cursor보다 작은 cursor를 가지는 게시물들은 좀 더 오래된 게시물들
-    const sql = `select id, user_key, writer_name, writer_portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
-                from board
-                where tag = ${tag} and (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < '${cursor}'
-                order by cursor desc
-                limit 10;`;
+    try {
+        // cursor 기반 페이지네이션
+        // 클라이언트가 가져간 마지막 row의 순서상 다음 row들을 10개 요청/응답하게 구현
+        // 기준: cursor
+        // cursor: created_at(14자) + id(10자) --> 24자 string
+        // 가장 최근 게시물 10개를 받고 싶다면 cursor를 '999999999999999999999999'를 보내주면 됨.(9가 24개)
+        // cursor가 클수록 최근 게시물
+        // 직전에 받았던 게시물의 cursor보다 작은 cursor를 가지는 게시물들은 좀 더 오래된 게시물들
+        const sql1 = `select id, user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at, (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) as cursor
+                    from board
+                    where tag = ${tag} and (to_char(created_at, 'YYYYMMDDHH24MISS') || lpad(id::text, 10, '0')) < '${cursor}'
+                    order by cursor desc
+                    limit 10;`; // 게시글 조회 쿼리
+        const sql2 = `select name, portrait
+                    from profile
+                    where id = $1;`; // 작성자 정보 조회 쿼리
+        const sql3 = `select is_on
+                    from cheer
+                    where user_key = '${user_key}' and board_key = $1;`; // 로그인 유저 좋아요 누름 확인 쿼리
 
-    pg.query(sql, (err, rows) => {
-        if (err) throw err;
-        if (rows) {
-            responseData.result = rows.rowCount;
-            responseData.post = rows.rows;
+        const boardRes = await pg.query(sql1); // 최근 게시물 최대 10개 가져오기
+        if (boardRes.rowCount != 0) {
+            responseData.result = boardRes.rowCount;
+            responseData.post = boardRes.rows;
         } else {
             responseData.result = 0;
         }
+        
+        for (var i = 0; i < boardRes.rowCount; i++) {
+            var profileRes = await pg.query(sql2, [boardRes.rows[i]['user_key']]); // 작성자 이름, 프로필 사진 가져오기
+            if (profileRes.rowCount != 0) {
+                responseData.writer_result = 1;
+                responseData.post[i].writer_name = profileRes.rows[0]['name'];
+                responseData.post[i].writer_portrait = profileRes.rows[0]['portrait'];
+            } else {
+                responseData.writer_result = 0;
+            }
+
+            var cheerRes = await pg.query(sql3, [boardRes.rows[i]['id']]); // 로그인 유저의 좋아요 누름 여부 확인하기
+            if (cheerRes.rowCount != 0) { // 좋아요 추가/취소 기록 있으면 해당 기록 response
+                responseData.post[i].is_on = cheerRes.rows[0]['is_on'];
+            } else { // 좋아요 추가/취소 기록 없으면 좋아요 추가X이므로 false response
+                responseData.post[i].is_on = false;
+            }
+        }
+
         res.status(200).json(responseData);
-    });   
+
+    } catch (err) {
+        throw err;
+    }
 });
 
 
 // 요청 받은 ID의 게시물 조회 API (게시물 상세 조회 API)
 // request: id (parameter values)
-router.get('/:id', cors(corsOptions), (req, res) => {
+router.get('/:id', cors(corsOptions), async(req, res) => {
     var responseData = {};
     const id = req.params.id;
 
-    const sql1 = `update board 
-                set view_count = view_count + 1 
-                where id = ${id};`; // 조회수 증가 쿼리
-    const sql2 = `select user_key, writer_name, writer_portrait, content, image1, image2, image3, image4, view_count, cheer_count, updated_at 
-                from board 
-                where id = ${id};`;
+    try {
+        const sql1 = `update board 
+                    set view_count = view_count + 1 
+                    where id = ${id};`; // 조회수 증가 쿼리
+        const sql2 = `select user_key, content, image1, image2, image3, image4, view_count, cheer_count, updated_at 
+                    from board 
+                    where id = ${id};`; // 게시물 조회 쿼리
+        const sql3 = `select name, portrait
+                    from profile
+                    where id = $1;`; // 작성자 정보 조회 쿼리
+        const sql4 = `update profile
+                    set total_point = total_point + 1, month_point = month_point + 1
+                    where id = $1;`; // 작성자 선행 포인트 증가 쿼리
+        
+        await pg.query(sql1); // 조회수 증가
 
-    pg.query(sql1+sql2, (err, rows) => {
-        if (err) throw err;
-        if (rows) {
+        var boardRes = await pg.query(sql2); // 게시물 조회
+        if (boardRes.rowCount != 0) {
             responseData.result = 1;
-            responseData.post = rows[1].rows;
-
-            const sql3 = `update profile
-                        set total_point = total_point + 1, month_point = month_point + 1
-                        where id = '${rows[1].rows[0].user_key}';`; // 작성자 선행 포인트 증가 쿼리
-            
-            pg.query(sql3, (err) => {
-                if (err) throw err;
-            });
-
+            responseData.post = boardRes.rows;
         } else {
             responseData.result = 0;
         }
+
+        var profileRes = await pg.query(sql3, [boardRes.rows[0]['user_key']]); // 작성자 이름, 프로필 사진 조회
+        if (profileRes.rowCount != 0) {
+            responseData.writer_result = 1;
+            responseData.post[0]['writer_name'] = profileRes.rows[0]['name'];
+            responseData.post[0]['wirter_portrait'] = profileRes.rows[0]['portrait'];
+        } else {
+            responseData.writer_result = 0;
+        }
+
+        await pg.query(sql4, [boardRes.rows[0]['user_key']]); // 작성자 선행 포인트 증가
+
         res.status(200).json(responseData);
-    });
+
+    } catch (err) {
+        throw err;
+    }
 });
 
 
@@ -121,22 +164,18 @@ getImageUrl = (image) => {
 router.post('/', cors(corsOptions), (req, res) => {
     var responseData = {};
 
-    const sql1 = `select name, portrait 
-                from profile 
-                where id = '${req.body.user_key}';`; // 작성자 이름, 프로필 사진 가져오는 쿼리
-    const sql2 = `update profile
+    const sql1 = `update profile
                 set total_point = total_point + 1, month_point = month_point + 1
                 where id = '${req.body.user_key}';`; // 작성자 선행 포인트 증가 쿼리
 
-
-    pg.query(sql1+sql2, (err, rows) => {
+    pg.query(sql1, (err, rows) => {
         if (err) throw err;
 
-        const sql3 = `insert into board (user_key, content, tag, writer_name, writer_portrait) 
-                    values ($1, $2, $3, $4, $5) returning id;`;
-        const dbInput = [req.body.user_key, req.body.content, req.body.tag, rows[0].rows[0]['name'], rows[0].rows[0]['portrait']];
+        const sql2 = `insert into board (user_key, content, tag) 
+                    values ($1, $2, $3) returning id;`;
+        const dbInput = [req.body.user_key, req.body.content, req.body.tag];
 
-        pg.query(sql3, dbInput, (err, rows) => {
+        pg.query(sql2, dbInput, (err, rows) => {
             if (err) throw err;
             if (rows.rowCount != 0) {
                 responseData.result = rows.rowCount;
