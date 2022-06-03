@@ -3,6 +3,8 @@ const router = express.Router();
 const pg = require('../db/index');
 const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
+var multipart = require('connect-multiparty');
+var multipartMiddleware = multipart();
 
 
 // cors 옵션 설정
@@ -105,7 +107,7 @@ router.options('/', cors(corsOptions), async(req, res) => {
 // 게시물 생성 API
 // request: user_key, content, image1, image2, image3, image4, tag (json)
 // request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장    
-router.post('/', cors(corsOptions), async(req, res) => {
+router.post('/', multipartMiddleware, cors(corsOptions), async(req, res) => {
     const sql1 = `select name, portrait 
                 from profile 
                 where id = '${req.body.user_key}';`; // 작성자 이름, 프로필 사진 가져오는 쿼리
@@ -117,14 +119,14 @@ router.post('/', cors(corsOptions), async(req, res) => {
     // 만약 image1이 null이 아니면(이미지 파일이 들어왔으면),
     // cloudinary에 이미지를 업로드하고 업로드 된 그 이미지의 secure_url을 받아옴.
     var imageUrls = {};
-    if (req.body.image1)
-        imageUrls.image1 = await getImageUrl(req.body.image1);
-    if (req.body.image2)
-        imageUrls.image2 = await getImageUrl(req.body.image2);
-    if (req.body.image3)
-        imageUrls.image3 = await getImageUrl(req.body.image3);
-    if (req.body.image4)
-        imageUrls.image4 = await getImageUrl(req.body.image4);
+    if (req.files.image1.size > 0)
+        imageUrls.image1 = await getImageUrl(req.files.image1.path);
+    if (req.files.image2.size > 0)
+        imageUrls.image2 = await getImageUrl(req.files.image2.path);
+    if (req.files.image3.size > 0)
+        imageUrls.image3 = await getImageUrl(req.files.image3.path);
+    if (req.files.image4.size > 0)
+        imageUrls.image4 = await getImageUrl(req.files.image4.path);
 
     pg.query(sql1+sql2, (err, rows) => {
         if (err) throw err;
@@ -170,7 +172,7 @@ router.options('/:id', cors(corsOptions), async(req, res) => {
 // request: content, image1, image2, image3, image4 (json)
 // 수정 안된 값도 그대로 json 파일에 포함시켜 꼭 보내주기!
 // 안보내주면 자동으로 null 값으로 들어감.
-router.post('/:id', cors(corsOptions), async(req, res) => {
+router.post('/:id', multipartMiddleware, cors(corsOptions), async(req, res) => {
     const id = req.params.id;
 
     const sql = `update board 
@@ -192,14 +194,14 @@ router.post('/:id', cors(corsOptions), async(req, res) => {
 
     // 수정된 이미지만 cloudinary에 업로드하고 그 url 받아서 디비에 넣어줌.
     var imageUrls = {};
-    if (req.body.image1)
-        imageUrls.image1 = await getImageUrl(req.body.image1);
-    if (req.body.image2)
-        imageUrls.image2 = await getImageUrl(req.body.image2);
-    if (req.body.image3)
-        imageUrls.image3 = await getImageUrl(req.body.image3);
-    if (req.body.image4)
-        imageUrls.image4 = await getImageUrl(req.body.image4);
+    if (req.files.image1.size > 0)
+        imageUrls.image1 = await getImageUrl(req.files.image1.path);
+    if (req.files.image2.size > 0)
+        imageUrls.image2 = await getImageUrl(req.files.image2.path);
+    if (req.files.image3.size > 0)
+        imageUrls.image3 = await getImageUrl(req.files.image3.path);
+    if (req.files.image4.size > 0)
+        imageUrls.image4 = await getImageUrl(req.files.image4.path);
 
     const dbInput = [req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4];
 
