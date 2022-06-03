@@ -16,6 +16,22 @@ const corsOptions = {
 }
 
 
+// 게시물 생성 API - cors preflight 처리 라우터
+router.options('/', cors(corsOptions), async(req, res) => {
+    res.sendStatus(200);
+ });
+
+ // 이미지 업로드 API - cors preflight 처리 라우터
+router.options('/image/:id', cors(corsOptions), async(req, res) => {
+    res.sendStatus(200);
+ });
+
+ // 게시물 수정, 삭제 API - cors preflight 처리 라우터
+router.options('/:id', cors(corsOptions), async(req, res) => {
+    res.sendStatus(200);
+ });
+
+
 // 게시판의 한 페이지에 해당하는 게시물 조회 API
 // request: tag, cursor (query string)
 router.get('/', cors(corsOptions), (req,res) => {
@@ -98,13 +114,7 @@ getImageUrl = (image) => {
 }
 
 
-// 게시물 생성 API - cors preflight 처리 라우터
-router.options('/', cors(corsOptions), async(req, res) => {
-   res.sendStatus(200);
-});
-
-
-// 게시물 생성 API
+// 게시물 생성 API - 내용 받아서 Create
 // request: user_key, content, tag (json)
 // response: id (json)
 // request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장    
@@ -140,6 +150,35 @@ router.post('/', multipartMiddleware, cors(corsOptions), async(req, res) => {
 });
 
 
+// 이미지 업로드 API
+// request: image1, image2, image3, image4 (form-data)
+router.post('/image/:id', multipartMiddleware, cors(corsOptions), async(req, res) => {
+    const id = req.params.id;
+
+    // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
+    // 만약 image1이 null이 아니면(이미지 파일이 들어왔으면),
+    // cloudinary에 이미지를 업로드하고 업로드 된 그 이미지의 secure_url을 받아옴.
+    var imageUrls = {};
+    if (req.files.image1.size > 0)
+        imageUrls.image1 = await getImageUrl(req.files.image1.path);
+    if (req.files.image2.size > 0)
+        imageUrls.image2 = await getImageUrl(req.files.image2.path);
+    if (req.files.image3.size > 0)
+        imageUrls.image3 = await getImageUrl(req.files.image3.path);
+    if (req.files.image4.size > 0)
+        imageUrls.image4 = await getImageUrl(req.files.image4.path);
+
+    const sql = `insert into board (image1, image2, image3, image4) 
+                values ($1, $2, $3, $4)
+                where id = ${id};`;
+    const dbInput = [imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4];
+
+    pg.query(sql, dbInput, (err) => {
+        if (err) throw err;
+        res.sendStatus(201);
+    });
+
+});
 // // 게시물 생성 API
 // // request: user_key, content, image1, image2, image3, image4, tag (json)
 // // request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장    
@@ -151,25 +190,25 @@ router.post('/', multipartMiddleware, cors(corsOptions), async(req, res) => {
 //                 set total_point = total_point + 1, month_point = month_point + 1
 //                 where id = '${req.body.user_key}';`; // 작성자 선행 포인트 증가 쿼리
 
-//     // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
-//     // 만약 image1이 null이 아니면(이미지 파일이 들어왔으면),
-//     // cloudinary에 이미지를 업로드하고 업로드 된 그 이미지의 secure_url을 받아옴.
-//     var imageUrls = {};
-//     if (req.files.image1.size > 0)
-//         imageUrls.image1 = await getImageUrl(req.files.image1.path);
-//     if (req.files.image2.size > 0)
-//         imageUrls.image2 = await getImageUrl(req.files.image2.path);
-//     if (req.files.image3.size > 0)
-//         imageUrls.image3 = await getImageUrl(req.files.image3.path);
-//     if (req.files.image4.size > 0)
-//         imageUrls.image4 = await getImageUrl(req.files.image4.path);
+    // // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
+    // // 만약 image1이 null이 아니면(이미지 파일이 들어왔으면),
+    // // cloudinary에 이미지를 업로드하고 업로드 된 그 이미지의 secure_url을 받아옴.
+    // var imageUrls = {};
+    // if (req.files.image1.size > 0)
+    //     imageUrls.image1 = await getImageUrl(req.files.image1.path);
+    // if (req.files.image2.size > 0)
+    //     imageUrls.image2 = await getImageUrl(req.files.image2.path);
+    // if (req.files.image3.size > 0)
+    //     imageUrls.image3 = await getImageUrl(req.files.image3.path);
+    // if (req.files.image4.size > 0)
+    //     imageUrls.image4 = await getImageUrl(req.files.image4.path);
 
 //     pg.query(sql1+sql2, (err, rows) => {
 //         if (err) throw err;
 
-//         const sql3 = `insert into board (user_key, content, image1, image2, image3, image4, tag, writer_name, writer_portrait) 
-//                     values ($1, $2, $3, $4, $5, $6, $7, $8, $9);`;
-//         const dbInput = [req.body.user_key, req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4, req.body.tag, rows[0].rows[0]['name'], rows[0].rows[0]['portrait']];
+        // const sql3 = `insert into board (user_key, content, image1, image2, image3, image4, tag, writer_name, writer_portrait) 
+        //             values ($1, $2, $3, $4, $5, $6, $7, $8, $9);`;
+        // const dbInput = [req.body.user_key, req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4, req.body.tag, rows[0].rows[0]['name'], rows[0].rows[0]['portrait']];
 
 //         pg.query(sql3, dbInput, (err) => {
 //             if (err) throw err;
