@@ -115,7 +115,7 @@ router.post('/', multipartMiddleware, cors(corsOptions), async(req, res) => {
                 set total_point = total_point + 1, month_point = month_point + 1
                 where id = '${req.body.user_key}';`; // 작성자 선행 포인트 증가 쿼리
 
-                // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
+    // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
     // 만약 image1이 null이 아니면(이미지 파일이 들어왔으면),
     // cloudinary에 이미지를 업로드하고 업로드 된 그 이미지의 secure_url을 받아옴.
     var imageUrls = {};
