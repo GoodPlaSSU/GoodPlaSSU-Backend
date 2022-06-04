@@ -276,50 +276,44 @@ getDelImageUrl = (sql, index) => {
 }
 
 
-// 게시물 수정, 삭제 API - cors preflight 처리 라우터
-router.options('/:id', cors(corsOptions), async(req, res) => {
-    res.sendStatus(200);
- });
-
-
 // 게시물 수정 API
-// request: content, image1, image2, image3, image4 (json)
+// request: content (json)
 // 수정 안된 값도 그대로 json 파일에 포함시켜 꼭 보내주기!
 // 안보내주면 자동으로 null 값으로 들어감.
 router.post('/:id', multipartMiddleware, cors(corsOptions), async(req, res) => {
     const id = req.params.id;
 
     const sql = `update board 
-                set content = $1, image1 = $2, image2 = $3, image3 = $4, image4 = $5, updated_at = NOW() 
+                set content = $1, updated_at = NOW() 
                 where id = ${id};`;
 
-    // 기존에 cloudinary 서버에 올라가있는 이미지도 지우기 위한 부분.
-    var i;
-    for (i = 1; i <= 4; i++) {
-        const delImgSql = `select image${i} from board where id = ${id};`;
-        var delImgUrl = await getDelImageUrl(delImgSql, i);
-        if (delImgUrl) {
-            const public_id = delImgUrl.split("/").pop().split(".")[0];
-            cloudinary.uploader.destroy(public_id, (err) => {
-                if (err) throw err;
-            })
-        }
-    }
+    // // 기존에 cloudinary 서버에 올라가있는 이미지도 지우기 위한 부분.
+    // var i;
+    // for (i = 1; i <= 4; i++) {
+    //     const delImgSql = `select image${i} from board where id = ${id};`;
+    //     var delImgUrl = await getDelImageUrl(delImgSql, i);
+    //     if (delImgUrl) {
+    //         const public_id = delImgUrl.split("/").pop().split(".")[0];
+    //         cloudinary.uploader.destroy(public_id, (err) => {
+    //             if (err) throw err;
+    //         })
+    //     }
+    // }
 
-    // 수정된 이미지만 cloudinary에 업로드하고 그 url 받아서 디비에 넣어줌.
-    var imageUrls = {};
-    if (req.files.image1.size > 0)
-        imageUrls.image1 = await getImageUrl(req.files.image1.path);
-    if (req.files.image2.size > 0)
-        imageUrls.image2 = await getImageUrl(req.files.image2.path);
-    if (req.files.image3.size > 0)
-        imageUrls.image3 = await getImageUrl(req.files.image3.path);
-    if (req.files.image4.size > 0)
-        imageUrls.image4 = await getImageUrl(req.files.image4.path);
+    // // 수정된 이미지만 cloudinary에 업로드하고 그 url 받아서 디비에 넣어줌.
+    // var imageUrls = {};
+    // if (req.files.image1.size > 0)
+    //     imageUrls.image1 = await getImageUrl(req.files.image1.path);
+    // if (req.files.image2.size > 0)
+    //     imageUrls.image2 = await getImageUrl(req.files.image2.path);
+    // if (req.files.image3.size > 0)
+    //     imageUrls.image3 = await getImageUrl(req.files.image3.path);
+    // if (req.files.image4.size > 0)
+    //     imageUrls.image4 = await getImageUrl(req.files.image4.path);
 
-    const dbInput = [req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4];
+    //const dbInput = [req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4];
 
-    pg.query(sql, dbInput, (err) => {
+    pg.query(sql, [req.body.content], (err) => {
         if (err) throw err;
         res.sendStatus(201);
     });
