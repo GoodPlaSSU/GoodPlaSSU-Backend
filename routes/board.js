@@ -207,8 +207,8 @@ router.post('/image/:id', multipartMiddleware, cors(corsOptions), async(req, res
     if (req.files.image4.size > 0)
         imageUrls.image4 = await getImageUrl(req.files.image4.path);
 
-    const sql = `insert into board (image1, image2, image3, image4) 
-                values ($1, $2, $3, $4)
+    const sql = `update board set
+                image1 = $1, image2 = $2, image3 = $3, image4 = $4
                 where id = ${id};`;
     const dbInput = [imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4];
 
