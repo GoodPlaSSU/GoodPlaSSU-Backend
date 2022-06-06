@@ -244,6 +244,7 @@ getDelImageUrl = (sql, index) => {
 // 수정 안된 값도 그대로 json 파일에 포함시켜 꼭 보내주기!
 // 안보내주면 자동으로 null 값으로 들어감.
 router.post('/:id', multipartMiddleware, cors(corsOptions), async(req, res) => {
+    var responseData = {};
     const id = req.params.id;
 
     const sql = `update board 
@@ -252,7 +253,9 @@ router.post('/:id', multipartMiddleware, cors(corsOptions), async(req, res) => {
 
     pg.query(sql, [req.body.content], (err) => {
         if (err) throw err;
-        res.sendStatus(201);
+        responseData.result = 1;
+        responseData.id = id;
+        res.status(201).json(responseData);
     });
 });
 
