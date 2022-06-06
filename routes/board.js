@@ -192,19 +192,20 @@ router.post('/', cors(corsOptions), (req, res) => {
 // 이미지 업로드 API
 // request: image1, image2, image3, image4 (form-data)
 router.post('/image/:id', multipartMiddleware, cors(corsOptions), async(req, res) => {
+    // res.setHeader('Access-Control-Allow-Origin', "http://localhost:3000");
     const id = req.params.id;
 
     // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
     // 만약 image1이 null이 아니면(이미지 파일이 들어왔으면),
     // cloudinary에 이미지를 업로드하고 업로드 된 그 이미지의 secure_url을 받아옴.
     var imageUrls = {};
-    if (req.files.image1.size)
+    if (req.files.image1)
         imageUrls.image1 = await getImageUrl(req.files.image1.path);
-    if (req.files.image2.size)
+    if (req.files.image2)
         imageUrls.image2 = await getImageUrl(req.files.image2.path);
-    if (req.files.image3.size)
+    if (req.files.image3)
         imageUrls.image3 = await getImageUrl(req.files.image3.path);
-    if (req.files.image4.size)
+    if (req.files.image4)
         imageUrls.image4 = await getImageUrl(req.files.image4.path);
 
     const sql = `update board set
