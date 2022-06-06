@@ -16,10 +16,6 @@ var loginRouter = require('./routes/login');
 
 var app = express();
 
-// morgan 이용해서 로그 출력
-const morgan = require('morgan');
-app.use(morgan('combined'));
-
 // db connection
 const db = require('./db/index');
 db.connect(err => {
