@@ -8,8 +8,15 @@ var multipartMiddleware = multipart();
 
 
 // cors 옵션 설정
+// const corsOptions = {
+//     origin: ["http://localhost:3000", "https://localhost:3000", "http://goodplassu.herokuapp.com", "https://goodplassu.herokuapp.com"],
+//     credentials : true,
+//     methods : 'GET,POST,DELETE,OPTIONS',
+//     optionSuccessStatus: 200
+// }
+
 const corsOptions = {
-    origin: ["http://localhost:3000", "https://localhost:3000", "http://goodplassu.herokuapp.com", "https://goodplassu.herokuapp.com"],
+    origin: "http://localhost:3000",
     credentials : true,
     methods : 'GET,POST,DELETE,OPTIONS',
     optionSuccessStatus: 200
