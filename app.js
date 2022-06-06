@@ -1,7 +1,3 @@
-// morgan 이용해서 로그 출력
-const morgan = require('morgan');
-app.use(morgan('combined'));
-
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -19,6 +15,10 @@ var monthPointRouter = require('./routes/monthPoint');
 var loginRouter = require('./routes/login');
 
 var app = express();
+
+// morgan 이용해서 로그 출력
+const morgan = require('morgan');
+app.use(morgan('combined'));
 
 // db connection
 const db = require('./db/index');
