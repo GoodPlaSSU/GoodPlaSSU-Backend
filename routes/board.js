@@ -199,13 +199,13 @@ router.post('/image/:id', multipartMiddleware, cors(corsOptions), async(req, res
     // 만약 image1이 null이 아니면(이미지 파일이 들어왔으면),
     // cloudinary에 이미지를 업로드하고 업로드 된 그 이미지의 secure_url을 받아옴.
     var imageUrls = {};
-    if (req.files.image1.size > 0)
+    if (req.files.image1.size)
         imageUrls.image1 = await getImageUrl(req.files.image1.path);
-    if (req.files.image2.size > 0)
+    if (req.files.image2.size)
         imageUrls.image2 = await getImageUrl(req.files.image2.path);
-    if (req.files.image3.size > 0)
+    if (req.files.image3.size)
         imageUrls.image3 = await getImageUrl(req.files.image3.path);
-    if (req.files.image4.size > 0)
+    if (req.files.image4.size)
         imageUrls.image4 = await getImageUrl(req.files.image4.path);
 
     const sql = `update board set
