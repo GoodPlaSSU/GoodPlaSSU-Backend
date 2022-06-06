@@ -1,3 +1,7 @@
+// morgan 이용해서 로그 출력
+const morgan = require('morgan');
+app.use(morgan('combined'));
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
