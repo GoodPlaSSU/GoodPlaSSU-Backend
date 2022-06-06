@@ -192,7 +192,6 @@ router.post('/', cors(corsOptions), (req, res) => {
 // 이미지 업로드 API
 // request: image1, image2, image3, image4 (form-data)
 router.post('/image/:id', multipartMiddleware, cors(corsOptions), async(req, res) => {
-    // res.setHeader('Access-Control-Allow-Origin', "http://localhost:3000");
     const id = req.params.id;
 
     // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
@@ -219,43 +218,6 @@ router.post('/image/:id', multipartMiddleware, cors(corsOptions), async(req, res
     });
 
 });
-// // 게시물 생성 API
-// // request: user_key, content, image1, image2, image3, image4, tag (json)
-// // request로 받은 내용과 작성자 이름과 프로필 사진까지 함께 저장    
-// router.post('/', multipartMiddleware, cors(corsOptions), async(req, res) => {
-//     const sql1 = `select name, portrait 
-//                 from profile 
-//                 where id = '${req.body.user_key}';`; // 작성자 이름, 프로필 사진 가져오는 쿼리
-//     const sql2 = `update profile
-//                 set total_point = total_point + 1, month_point = month_point + 1
-//                 where id = '${req.body.user_key}';`; // 작성자 선행 포인트 증가 쿼리
-
-    // // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
-    // // 만약 image1이 null이 아니면(이미지 파일이 들어왔으면),
-    // // cloudinary에 이미지를 업로드하고 업로드 된 그 이미지의 secure_url을 받아옴.
-    // var imageUrls = {};
-    // if (req.files.image1.size > 0)
-    //     imageUrls.image1 = await getImageUrl(req.files.image1.path);
-    // if (req.files.image2.size > 0)
-    //     imageUrls.image2 = await getImageUrl(req.files.image2.path);
-    // if (req.files.image3.size > 0)
-    //     imageUrls.image3 = await getImageUrl(req.files.image3.path);
-    // if (req.files.image4.size > 0)
-    //     imageUrls.image4 = await getImageUrl(req.files.image4.path);
-
-//     pg.query(sql1+sql2, (err, rows) => {
-//         if (err) throw err;
-
-        // const sql3 = `insert into board (user_key, content, image1, image2, image3, image4, tag, writer_name, writer_portrait) 
-        //             values ($1, $2, $3, $4, $5, $6, $7, $8, $9);`;
-        // const dbInput = [req.body.user_key, req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4, req.body.tag, rows[0].rows[0]['name'], rows[0].rows[0]['portrait']];
-
-//         pg.query(sql3, dbInput, (err) => {
-//             if (err) throw err;
-//             res.sendStatus(201);
-//         });
-//     });
-// });
 
 
 // 수정 및 삭제할 때 필요. Cloudinary 서버에 있는 이미지를 지우기 위함.
@@ -287,32 +249,6 @@ router.post('/:id', multipartMiddleware, cors(corsOptions), async(req, res) => {
     const sql = `update board 
                 set content = $1, updated_at = NOW() 
                 where id = ${id};`;
-
-    // // 기존에 cloudinary 서버에 올라가있는 이미지도 지우기 위한 부분.
-    // var i;
-    // for (i = 1; i <= 4; i++) {
-    //     const delImgSql = `select image${i} from board where id = ${id};`;
-    //     var delImgUrl = await getDelImageUrl(delImgSql, i);
-    //     if (delImgUrl) {
-    //         const public_id = delImgUrl.split("/").pop().split(".")[0];
-    //         cloudinary.uploader.destroy(public_id, (err) => {
-    //             if (err) throw err;
-    //         })
-    //     }
-    // }
-
-    // // 수정된 이미지만 cloudinary에 업로드하고 그 url 받아서 디비에 넣어줌.
-    // var imageUrls = {};
-    // if (req.files.image1.size > 0)
-    //     imageUrls.image1 = await getImageUrl(req.files.image1.path);
-    // if (req.files.image2.size > 0)
-    //     imageUrls.image2 = await getImageUrl(req.files.image2.path);
-    // if (req.files.image3.size > 0)
-    //     imageUrls.image3 = await getImageUrl(req.files.image3.path);
-    // if (req.files.image4.size > 0)
-    //     imageUrls.image4 = await getImageUrl(req.files.image4.path);
-
-    //const dbInput = [req.body.content, imageUrls.image1, imageUrls.image2, imageUrls.image3, imageUrls.image4];
 
     pg.query(sql, [req.body.content], (err) => {
         if (err) throw err;
