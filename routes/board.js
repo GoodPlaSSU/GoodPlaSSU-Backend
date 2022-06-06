@@ -192,7 +192,7 @@ router.post('/', cors(corsOptions), (req, res) => {
 // 이미지 업로드 API
 // request: image1, image2, image3, image4 (form-data)
 router.post('/image/:id', multipartMiddleware, cors(corsOptions), async(req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', "http://localhost:3000");
+    // res.setHeader('Access-Control-Allow-Origin', "http://localhost:3000");
     const id = req.params.id;
 
     // image가 4개까지 들어올 수 있어서 각각 변수로 만들지 않고 리스트로 만듦.
