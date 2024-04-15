@@ -26,9 +26,12 @@ db.connect(err => {
 // cloudinary connection
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+const port = process.env.PORT || 3000;
+app.listen(port, "0.0.0.0");
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

@@ -6,7 +6,7 @@ const cors = require('cors');
 
 // cors 옵션 설정
 const corsOptions = {
-    origin: ["http://localhost:3000", "https://localhost:3000", "http://goodplassu.herokuapp.com", "https://goodplassu.herokuapp.com"],
+    origin: ["http://localhost:3000", "https://localhost:3000", "https://goodplassu.netlify.app/"],
     credentials : true,
     methods : 'GET,POST,DELETE,OPTIONS',
     optionSuccessStatus: 200
